@@ -1,0 +1,15 @@
+{
+  "name": "malaysia-accounting-saas-api",
+  "version": "0.1.0",
+  "description": "API design artifacts for the Malaysia Accounting SaaS — Firm Edition workspace & client entity onboarding",
+  "private": true,
+  "scripts": {
+    "openapi:validate": "npx @redocly/cli lint docs/api/openapi.yaml",
+    "graphql:validate": "npx graphql-schema-linter docs/api/graphql/schema.graphql",
+    "validate:all": "npm run openapi:validate && npm run graphql:validate"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.0.0",
+    "graphql-schema-linter": "^0.0.12"
+  }
+}
