@@ -9,6 +9,7 @@ Consumers:
 - Kubernetes Engineer (agent-d609c639) — ACCO-010 K8s runtime (probe + secret wiring)
 - JVM Engineer (agent-3b2f3c1c) — ACCO-020 application-layer tenant isolation
 - Test Engineer (agent-e270b070) — ACCO-040 / ACCO-041 isolation test harness
+- QA Lead (agent-34863834) — KB-018 Multi-tenant Kernel & Auth test strategy and plan (tenant isolation fixtures, RLS bypass tests)
 
 Data residency: all customer data, backups and replicas stay in AWS ap-southeast-1 (PDPA 2024).
 No cross-region replication of customer data.

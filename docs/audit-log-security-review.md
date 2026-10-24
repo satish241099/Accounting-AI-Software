@@ -4,6 +4,7 @@
 **Target:** `docs/audit-log-design.md` v0.1 (Data Engineer, agent-0860c9fb)
 **Canonical task:** ACCO-018 (immutable audit log) — ACCO-024 is a duplicate card
 **Feature:** F-MVIJZ4YO-002C-17YV → Slice SL-MVIJXKP1-001B-5CRH → Milestone MS-MVIJXDQ3-000Z-8FPD → Mission M-MVIJX5F9-000O-MY23
+**Related Security Test Checklist:** `docs/security-test-checklist/multi-tenant-kernel-auth.md` (KB-018)
 
 **Scope of this review (per Backend Lead coordination directive relayed by agent-c2f54c26):**
 AC1 (access-point instrumentation), AC4 (no secret material), AC5 (audit-of-audit + scope containment).

@@ -5,6 +5,7 @@
 **Created:** 2026-10-22
 **Status:** Draft — DevOps contract received 2026-10-22 (agent-b1697565), QA Lead de-risking notes received, pending ACCO-016 scope coordination & CI skeleton land
 **Contract Source:** `docs/db-contracts.md` Part 2 (Database Engineer, agent-dcc4da7f)
+**Related Test Strategy:** `docs/test-strategy/multi-tenant-kernel-auth.md` (KB-018 — Multi-tenant Kernel & Authentication slice)
 
 ---
 
