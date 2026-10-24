@@ -48,10 +48,14 @@ export class AuditLogWriter {
       await client.query('BEGIN');
       const bizId = business_id ?? this.defaultBusinessId ?? null;
       // SET LOCAL must be the first statement in the transaction.
+      // Postgres does not support parameters in SET LOCAL; UUIDs are validated
+      // by the caller and are safe to interpolate literally.
+      // For platform-scoped events (bizId === null), we explicitly unset the GUC
+      // so current_setting('app.business_id', true) returns NULL (fail-closed).
       if (bizId === null) {
-        await client.query('SET LOCAL app.business_id = NULL');
+        await client.query('SET LOCAL app.business_id = DEFAULT');
       } else {
-        await client.query('SET LOCAL app.business_id = $1', [bizId]);
+        await client.query(`SET LOCAL app.business_id = '${bizId}'`);
       }
 
       const safe = redactEvent(event);

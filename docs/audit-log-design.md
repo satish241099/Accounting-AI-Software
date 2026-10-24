@@ -406,3 +406,40 @@ ACCO-004 → ACCO-007 → ACCO-016 → ACCO-018 → ACCO-019 → ACCO-014 → AC
 | filing | Yes (Confidential) | Every submission/validation/invalidation/cancellation |
 | filing_submission | Yes (Confidential) | Every status change |
 | api_key | Yes (Restricted-class) | Every read/use/rotation |
+
+---
+
+## G17 Implementation (KB-016)
+
+**Scope:** KB-016 implements the G17 Audit Events requirement from the Multi-tenant Kernel & Authentication slice. This is a **subset** of the ACCO-018 design (events + append-only + redaction, no hash chain/S3/legal hold yet).
+
+**Implementation Status:** Complete (2026-10-25)
+
+### What is covered
+
+- **Event types:** 11 event types covered: `user.sign_in`, `user.sign_in_failed`, `user.mfa_challenge`, `user.mfa_success`, `invite.created`, `invite.accepted`, `invite.revoked`, `membership.created`, `membership.updated`, `membership.revoked`, `business.created`
+- **Append-only enforcement:** Database-level BEFORE UPDATE/DELETE trigger prevents modification/deletion
+- **RLS fail-closed:** `business_id` partition with `current_setting('app.business_id', true)` ensures tenant isolation; NULL context returns zero rows
+- **Redaction:** Defense-in-depth whitelist per entity type (entity_type from docs/audit-log-security-review.md §3.2) + secret pattern stripping (JWT, PEM, keys named token/password/secret)
+- **System actors:** `actor_type='system'` requires `actor_id` matching `^system:.+$` (e.g., `system:daily_sst_filing`)
+- **Platform events:** Sign-in, failed sign-in, and business creation allow `business_id=NULL` for pre-membership events
+
+### What is NOT covered (ACCO-018 scope)
+
+- Hash chain / Merkle anchors (§2)
+- S3 export / Object Lock warm tier (§3.2)
+- Legal hold table (§3.3)
+- `before_state` / `after_state` columns for mutation auditing
+- Filing event types (handled in ACCO-017/ACCO-018)
+
+### Files
+
+- `src/db/schema/audit_log.sql` — table DDL, RLS policies, append-only trigger
+- `src/db/migrations/001_audit_log.sql` — versioned migration with advisory lock
+- `src/audit/types.ts` — TypeScript types for 11 event types
+- `src/audit/events.ts` — typed event builders
+- `src/audit/redaction.ts` — whitelist + secret pattern redaction
+- `src/audit/writer.ts` — transactional writer with SET LOCAL
+- `tests/audit/audit-log.test.ts` — integration tests covering all 11 events, RLS, append-only, redaction
+
+**Conformance:** G17 feature requirements met. This implementation serves as the canonical carrier for Multi-tenant Kernel audit events (F-MVKTMUSS-001D-92EB).

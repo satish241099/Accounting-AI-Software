@@ -72,7 +72,7 @@ export function redactEvent(event: AuditEvent): AuditEvent {
   // Redact metadata, and defensively strip any secret patterns in ip/user_agent
   const safe: AuditEvent = {
     ...whitelisted,
-    metadata: stripSecretPatterns(whitelisted.metadata ?? {}),
+    metadata: stripSecretPatterns(whitelisted.metadata ?? {}) as Record<string, unknown>,
     ip_address: typeof whitelisted.ip_address === 'string' ? whitelisted.ip_address : undefined,
     user_agent: typeof whitelisted.user_agent === 'string' ? whitelisted.user_agent : undefined,
   };
