@@ -6,10 +6,27 @@
   "scripts": {
     "openapi:validate": "npx @redocly/cli lint docs/api/openapi.yaml",
     "graphql:validate": "npx graphql-schema-linter docs/api/graphql/schema.graphql",
-    "validate:all": "npm run openapi:validate && npm run graphql:validate"
+    "validate:all": "npm run openapi:validate && npm run graphql:validate",
+    "test": "vitest run tests/audit/",
+    "test:audit": "vitest run tests/audit/"
+  },
+  "overrides": {
+    "graphql-schema-linter": {
+      "cosmiconfig": "$cosmiconfig"
+    }
   },
   "devDependencies": {
     "@redocly/cli": "^1.0.0",
-    "graphql-schema-linter": "^0.0.12"
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "cosmiconfig": "^3.1.0",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "graphql-schema-linter": "^0.0.12",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
   }
 }
