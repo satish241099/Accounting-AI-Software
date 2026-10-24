@@ -10,6 +10,6 @@
   },
   "devDependencies": {
     "@redocly/cli": "^1.0.0",
-    "graphql-schema-linter": "^0.0.12"
+    "graphql-schema-linter": "^1.0.1"
   }
 }
