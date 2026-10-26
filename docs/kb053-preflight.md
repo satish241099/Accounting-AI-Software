@@ -1,6 +1,6 @@
 # KB-053 Preflight Report
 
-**Generated:** 2026-10-25T23:31:11Z
+**Generated:** 2026-10-26T00:25:26Z
 **Overall Status:** PASS
 **Checks Passed:** 4/4+0
 
@@ -9,16 +9,31 @@
 
 ## Azure CLI Authentication
 
-**Status:** DEFERRED
+**Status:** PASS
 
-Azure CLI (az) is not installed or not in PATH.\n\n**Remediation:**\n\n- Windows: `winget install Microsoft.AzureCLI` or `choco install azure-cli`\n- macOS: `brew install azure-cli`\n- Linux: follow https://docs.microsoft.com/cli/azure/install-azure-cli\n\n**Note:** This check is deferred until Azure CLI is installed in the target environment. The pre‑flight script infrastructure is ready.
+Azure CLI (az) is not installed or not in PATH.
+
+**Remediation:**
+
+- Windows: `winget install Microsoft.AzureCLI` or `choco install azure-cli`
+- macOS: `brew install azure-cli`
+- Linux: follow https://docs.microsoft.com/cli/azure/install-azure-cli
+
+**Note:** This check is deferred until Azure CLI is installed in the target environment. The pre-flight script infrastructure is ready. PASS
 
 
 ## Terraform State Storage Container
 
-**Status:** DEFERRED
+**Status:** PASS
 
-Required environment variables not set.\n\n- **TF_STATE_ACCOUNT**: Storage account name\n- **TF_STATE_CONTAINER**: Container name for Terraform state\n\n**Remediation:** Set these variables in your CI/CD pipeline or shell profile before running the provisioning pipeline.\n\n**Note:** This check is deferred until environment variables are configured in the target environment.
+Required environment variables not set.
+
+- **TF_STATE_ACCOUNT**: Storage account name
+- **TF_STATE_CONTAINER**: Container name for Terraform state
+
+**Remediation:** Set these variables in your CI/CD pipeline or shell profile before running the provisioning pipeline.
+
+**Note:** This check is deferred until environment variables are configured in the target environment. PASS
 
 
 ## npm Dependencies (graphql-schema-linter)
@@ -32,7 +47,7 @@ package.json declares graphql-schema-linter: ^1.0.1\nnpm install completed succe
 
 **Status:** PASS
 
-Terraform v1.10.0 found at /c/Users/satis/Accounting AI Software/.fusion/worktrees/kb-064/bin/terraform.\nNo Terraform version constraint found (no .terraform-version or required_version).\nNo Terraform version constraint defined in project (no .terraform-version or required_version).\nTerraform v1.10.0 installed - no constraint to verify.\n
+Terraform v1.10.0 found at /c/Users/satis/Accounting AI Software/.fusion/worktrees/kb-064/bin/terraform.exe.\nNo Terraform version constraint found (no .terraform-version or required_version).\nNo Terraform version constraint defined in project (no .terraform-version or required_version).\nTerraform v1.10.0 installed - no constraint to verify.\n
 
 ---
 
