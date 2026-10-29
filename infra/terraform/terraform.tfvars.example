@@ -1,0 +1,25 @@
+# Example tfvars for the dev environment.
+# Copy to terraform.tfvars (gitignored) and adjust before applying.
+
+environment = "dev"
+location    = "southeastasia"
+
+# Optional VNet override; when empty, main.tf uses the per-env default (10.10.0.0/16 for dev).
+# vnet_cidr = "10.10.0.0/16"
+
+# Private endpoints are wired by KB-053 once PostgreSQL / Storage / Service Bus
+# resources exist. Example shape:
+#
+# private_endpoints = {
+#   postgres = {
+#     resource_id          = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>"
+#     subresource_names    = ["postgresqlServer"]
+#     private_dns_zone_ids = [module.private_endpoints.private_dns_zone_ids.postgres]
+#   }
+# }
+
+tags = {
+  managed-by = "terraform"
+  pdpa-scope = "true"
+  project    = "malaysia-accounting-saas"
+}

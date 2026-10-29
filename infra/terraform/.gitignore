@@ -1,0 +1,11 @@
+# Terraform generated files
+.terraform/
+*.lock.hcl
+!*.tf.state
+
+# Scratch/debug files
+tferr.txt
+tfschema.json
+
+# tfvars with actual values (keep example)
+terraform.tfvars
