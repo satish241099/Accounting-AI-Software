@@ -1,0 +1,263 @@
+# Default values for Malaysia Accounting SaaS Helm chart
+# Per-environment values files (values-dev.yaml, values-staging.yaml, values-prod.yaml) override these
+# Placeholder values (PLACEHOLDER_*) MUST be replaced by the Cloud Engineer (ACCO-004) before cluster deployment
+
+global:
+  env: "dev"  # overridden per-environment
+  imageRegistry: "PLACEHOLDER_ECR_REGISTRY"  # e.g. 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com
+  dnsDomain: "PLACEHOLDER_DNS_DOMAIN"  # e.g. accounting-saas.example.com
+  clusterName: "PLACEHOLDER_EKS_CLUSTER"  # EKS cluster name
+  # Infrastructure placeholders - Cloud Engineer provides concrete values
+  subnetIds: "PLACEHOLDER_SUBNET_IDS"
+  securityGroupIds: "PLACEHOLDER_SG_IDS"
+  eksEndpoint: "PLACEHOLDER_EKS_ENDPOINT"
+
+# Image configuration (pinned digests, non-root, secret-free)
+image:
+  repository: "accounting-saas"
+  tag: "latest"  # overridden by CI with semver + digest
+  pullPolicy: IfNotPresent
+  # Web (Next.js UI) - port 3000
+  web:
+    repository: "{{ .Values.image.repository }}/web"
+    tag: "{{ .Values.image.tag }}"
+  # API (Next.js API) - port 4000
+  api:
+    repository: "{{ .Values.image.repository }}/api"
+    tag: "{{ .Values.image.tag }}"
+  # Filing Worker - port 8080
+  worker:
+    repository: "{{ .Values.image.repository }}/filing-worker"
+    tag: "{{ .Values.image.tag }}"
+  # PgBouncer
+  pgbouncer:
+    repository: "edoburu/pgbouncer"  # well-known PgBouncer image
+    tag: "1.23.0"
+
+# Replica counts (base, overridden by HPA and per-env values)
+replicaCount:
+  web: 1
+  api: 1
+  worker: 1
+  pgbouncer: 1
+
+# Resource requests/limits (CPU in millicores, memory in MiB)
+# Production values should be larger; dev/staging override in their values files
+resources:
+  web:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  api:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  worker:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  pgbouncer:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+# Horizontal Pod Autoscaler (autoscaling/v2) - CPU + memory + custom metrics
+# api: CPU + request-rate (via KEDA ScaledObject)
+# worker: CPU + queue-depth (via KEDA ScaledObject)
+# web: CPU only
+# pgbouncer: CPU only (not typically autoscaled, but HPA present for consistency)
+hpa:
+  web:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  api:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  worker:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 4
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  pgbouncer:
+    enabled: false  # PgBouncer typically not autoscaled
+
+# KEDA ScaledObjects for event-driven autoscaling
+keda:
+  api:
+    enabled: true
+    pollingInterval: 15
+    cooldownPeriod: 300
+    triggers:
+      - type: prometheus
+        metadata:
+          serverAddress: "http://prometheus-operated.monitoring:9090"
+          metricName: "http_requests_per_second"
+          query: 'sum(rate(http_requests_total{service="api"}[1m])) by (pod)'
+          threshold: "100"
+          authModes: "none"
+  worker:
+    enabled: true
+    pollingInterval: 15
+    cooldownPeriod: 300
+    triggers:
+      - type: prometheus
+        metadata:
+          serverAddress: "http://prometheus-operated.monitoring:9090"
+          metricName: "filing_queue_depth"
+          query: 'sum(filing_queue_pending_jobs) by (pod)'
+          threshold: "10"
+          authModes: "none"
+
+# PodDisruptionBudget - ensures availability during voluntary disruptions
+pdb:
+  web:
+    enabled: true
+    minAvailable: 1
+  api:
+    enabled: true
+    minAvailable: 1
+  worker:
+    enabled: true
+    minAvailable: 1
+  pgbouncer:
+    enabled: true
+    minAvailable: 1
+
+# NetworkPolicy - restrict egress to required endpoints only
+networkPolicy:
+  enabled: true
+  # Egress rules defined per workload in templates
+
+# Node selection and tolerations
+nodeSelector: {}
+tolerations: []
+
+# ServiceAccount with IRSA annotations
+serviceAccount:
+  create: true
+  name: "accounting-saas"
+  annotations:
+    eks.amazonaws.com/role-arn: "PLACEHOLDER_IRSA_ROLE_ARN"  # Cloud Engineer provides
+  automountServiceAccountToken: true
+
+# External Secrets Operator configuration
+externalSecret:
+  create: true
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: "aws-secrets-manager"
+    kind: "ClusterSecretStore"
+  # Secret names follow db/{env}/postgres and db/{env}/admin pattern
+  # Values are templated per-environment
+
+# ClusterSecretStore for AWS Secrets Manager
+clusterSecretStore:
+  create: true
+  name: "aws-secrets-manager"
+  provider:
+    aws:
+      service: SecretsManager
+      region: "ap-southeast-1"
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: "external-secrets"
+            namespace: "external-secrets-system"
+
+# PgBouncer configuration
+pgbouncer:
+  config:
+    pool_mode: "transaction"
+    default_pool_size: 25
+    max_client_conn: 1000
+    reserve_pool_size: 5
+    reserve_pool_timeout: 3
+    server_reset_query: "DISCARD ALL"
+    server_reset_query_always: 0
+    listen_port: 6432
+    # Database config is templated per-environment with actual RDS endpoint
+    databases: {}
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+# RDS CA Bundle ConfigMap (public trust material, not a secret)
+rdsCa:
+  create: true
+  name: "rds-ca-bundle"
+  # Cloud Engineer provides the actual bundle content
+  bundleData: "PLACEHOLDER_RDS_CA_BUNDLE"
+
+# TLS configuration
+tls:
+  mode: "require"  # require | verify-full (prod uses verify-full)
+  # Certificates managed by cert-manager / AWS Certificate Manager
+  # Secret names per environment in values files
+
+# Health probe configuration
+probes:
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
+
+# Migration Job template
+migration:
+  image:
+    repository: "{{ .Values.image.repository }}/migrations"
+    tag: "{{ .Values.image.tag }}"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  # Runs as separate Job, never on app pod deploy path
+  # Uses db/{env}/admin secret (migrator role)

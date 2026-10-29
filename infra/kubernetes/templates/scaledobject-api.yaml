@@ -1,0 +1,16 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "accounting-saas.fullname" . }}-api
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  scaleTargetRef:
+    name: {{ include "accounting-saas.fullname" . }}-api
+  pollingInterval: {{ .Values.keda.api.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.api.cooldownPeriod }}
+  minReplicaCount: {{ .Values.hpa.api.minReplicas }}
+  maxReplicaCount: {{ .Values.hpa.api.maxReplicas }}
+  triggers:
+    {{- toYaml .Values.keda.api.triggers | nindent 4 }}

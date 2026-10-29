@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "accounting-saas.fullname" . }}-pgbouncer-config
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgbouncer
+data:
+  pgbouncer.ini: |
+    [databases]
+    {{- if .Values.pgbouncer.config.databases }}
+    {{- range $key, $value := .Values.pgbouncer.config.databases }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
+    {{- else }}
+    app = host={{ .Values.global.rdsEndpoint }} port=5432 dbname=app
+    {{- end }}
+
+    [pgbouncer]
+    listen_port = {{ .Values.pgbouncer.config.listen_port }}
+    pool_mode = {{ .Values.pgbouncer.config.pool_mode }}
+    max_client_conn = {{ .Values.pgbouncer.config.max_client_conn }}
+    default_pool_size = {{ .Values.pgbouncer.config.default_pool_size }}
+    reserve_pool_size = {{ .Values.pgbouncer.config.reserve_pool_size }}
+    reserve_pool_timeout = {{ .Values.pgbouncer.config.reserve_pool_timeout }}
+    server_reset_query = {{ .Values.pgbouncer.config.server_reset_query }}
+    server_reset_query_always = {{ .Values.pgbouncer.config.server_reset_query_always }}
+    auth_type = scram-sha-256
+    auth_file = /etc/pgbouncer/userlist.txt
+    log_connections = 1
+    log_disconnections = 1
+    log_pooler_errors = 1

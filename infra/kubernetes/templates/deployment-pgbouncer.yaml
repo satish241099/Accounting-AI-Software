@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "accounting-saas.fullname" . }}-pgbouncer
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgbouncer
+spec:
+  replicas: {{ .Values.replicaCount.pgbouncer }}
+  selector:
+    matchLabels:
+      {{- include "accounting-saas.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: pgbouncer
+  template:
+    metadata:
+      labels:
+        {{- include "accounting-saas.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: pgbouncer
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: pgbouncer
+          image: "{{ .Values.image.pgbouncer.repository }}:{{ .Values.image.pgbouncer.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: pgbouncer
+              containerPort: 6432
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "accounting-saas.fullname" . }}-db-config
+                  key: database_url
+            - name: PGBOUNCER_CONFIG
+              value: "/etc/pgbouncer/pgbouncer.ini"
+          resources:
+            {{- toYaml .Values.pgbouncer.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/pgbouncer/pgbouncer.ini
+              subPath: pgbouncer.ini
+              readOnly: true
+            - name: rds-ca-bundle
+              mountPath: /etc/ssl/certs/rds-ca-bundle.pem
+              subPath: rds-ca-bundle.pem
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "accounting-saas.fullname" . }}-pgbouncer-config
+        - name: rds-ca-bundle
+          configMap:
+            name: {{ .Values.rdsCa.name }}
