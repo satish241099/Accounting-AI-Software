@@ -1,3 +1,7 @@
+# Private DNS zones for services that downstream tasks (KB-053) will wire.
+# Each zone is created unconditionally so its ID is available for the
+# infra/README.md contract regardless of which endpoints are configured.
+
 resource "azurerm_private_dns_zone" "postgres" {
   name                = "privatelink.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
@@ -22,16 +26,29 @@ resource "azurerm_private_dns_zone" "servicebus" {
   tags                = var.tags
 }
 
+# Link every DNS zone to the environment VNet so name resolution works
+# for all private endpoints without per-zone boilerplate.
+
+locals {
+  dns_zones = {
+    postgres   = azurerm_private_dns_zone.postgres
+    keyvault   = azurerm_private_dns_zone.keyvault
+    blob       = azurerm_private_dns_zone.blob
+    servicebus = azurerm_private_dns_zone.servicebus
+  }
+}
+
 resource "azurerm_private_dns_zone_virtual_network_link" "links" {
   for_each             = var.private_dns_zones
   name                 = "link-${each.key}-${var.environment}"
-  resource_group_name  = var.resource_group_name
-  private_dns_zone_id  = azurerm_private_dns_zone[each.key].id
+  private_dns_zone_id  = local.dns_zones[each.key].id
   virtual_network_id   = var.vnet_id
   registration_enabled = false
   tags                 = var.tags
 }
 
+# Private endpoints — configured by KB-053 once the target resources exist.
+# The map is empty by default; downstream tasks populate it via tfvars.
 resource "azurerm_private_endpoint" "pe" {
   for_each            = var.private_endpoints
   name                = "pe-${each.key}-${var.environment}"

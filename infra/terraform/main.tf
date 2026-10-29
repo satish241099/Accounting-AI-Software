@@ -7,7 +7,6 @@
 
 locals {
   environment = var.environment
-  is_prod     = var.environment == "prod"
 
   # Per-environment defaults (PDPA: everything stays in southeastasia).
   vnet_cidrs = {

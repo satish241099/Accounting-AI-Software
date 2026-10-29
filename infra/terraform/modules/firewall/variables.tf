@@ -29,12 +29,6 @@ variable "firewall_subnet_id" {
   type        = string
 }
 
-variable "firewall_subnet_cidr" {
-  description = "CIDR of the AzureFirewallSubnet (documented for the infra/README.md contract; informational only)"
-  type        = string
-  default     = ""
-}
-
 variable "vnet_cidr" {
   description = "VNet CIDR block, used as the source for allow rules"
   type        = string
