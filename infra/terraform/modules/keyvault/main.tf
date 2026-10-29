@@ -12,16 +12,16 @@ resource "azurerm_user_assigned_identity" "keyvault" {
 }
 
 resource "azurerm_key_vault" "kv" {
-  name                          = "kv-${var.prefix}-${var.environment}-${var.suffix}"
-  location                      = var.location
-  resource_group_name           = azurerm_resource_group.keyvault.name
-  tenant_id                     = data.azurerm_client_config.current.tenant_id
-  sku_name                      = "premium"
-  rbac_authorization_enabled    = true
-  purge_protection_enabled      = true
-  soft_delete_retention_days    = 90
+  name                       = "kv-${var.prefix}-${var.environment}-${var.suffix}"
+  location                   = var.location
+  resource_group_name        = azurerm_resource_group.keyvault.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "premium"
+  rbac_authorization_enabled = true
+  purge_protection_enabled   = true
+  soft_delete_retention_days = 90
   public_network_access_enabled = false
-  tags                          = var.tags
+  tags                       = var.tags
 
   network_acls {
     bypass                     = "AzureServices"
@@ -49,7 +49,7 @@ resource "azurerm_key_vault_key" "cmk" {
     }
   }
 
-  expiration_date = timeadd(time_static.now.rfc3339, "8760h") # 1 year
+  expiration_date = "2027-12-31T23:59:59Z" # 1 year from 2026-10-29
 
   depends_on = [azurerm_role_assignment.kv_crypto_officer]
 }
@@ -67,28 +67,25 @@ resource "azurerm_role_assignment" "keyvault_identity_crypto_user" {
   principal_id         = azurerm_user_assigned_identity.keyvault.principal_id
 }
 
-# time_static resource needed for dynamic expiration dates
-resource "time_static" "now" {}
-
 # Placeholder secret references. Actual secret VALUES are injected by downstream tasks (KB-053),
 # not hardcoded here. We reserve the naming convention per infra/README.md contract.
 
 resource "azurerm_key_vault_secret" "db_admin" {
-  name            = "db-${var.environment}-admin"
+  name            = "db/${var.environment}/admin"
   value           = "placeholder-change-me"
   key_vault_id    = azurerm_key_vault.kv.id
   content_type    = "text/plain"
-  expiration_date = timeadd(time_static.now.rfc3339, "2160h") # 90 days
+  expiration_date = "2027-01-27T23:59:59Z" # 90 days from 2026-10-29
 
   depends_on = [azurerm_role_assignment.kv_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "db_app" {
-  name            = "db-${var.environment}-postgres"
+  name            = "db/${var.environment}/postgres"
   value           = "placeholder-change-me"
   key_vault_id    = azurerm_key_vault.kv.id
   content_type    = "text/plain"
-  expiration_date = timeadd(time_static.now.rfc3339, "2160h") # 90 days
+  expiration_date = "2027-01-27T23:59:59Z" # 90 days from 2026-10-29
 
   depends_on = [azurerm_role_assignment.kv_secrets_officer]
 }
