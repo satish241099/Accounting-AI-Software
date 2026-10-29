@@ -12,16 +12,16 @@ resource "azurerm_user_assigned_identity" "keyvault" {
 }
 
 resource "azurerm_key_vault" "kv" {
-  name                       = "kv-${var.prefix}-${var.environment}-${var.suffix}"
-  location                   = var.location
-  resource_group_name        = azurerm_resource_group.keyvault.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "premium"
-  rbac_authorization_enabled = true
-  purge_protection_enabled   = true
-  soft_delete_retention_days = 90
+  name                          = "kv-${var.prefix}-${var.environment}-${var.suffix}"
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.keyvault.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  sku_name                      = "premium"
+  rbac_authorization_enabled    = true
+  purge_protection_enabled      = true
+  soft_delete_retention_days    = 90
   public_network_access_enabled = false
-  tags                       = var.tags
+  tags                          = var.tags
 
   network_acls {
     bypass                     = "AzureServices"

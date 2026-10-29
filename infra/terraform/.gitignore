@@ -6,6 +6,7 @@
 # Scratch/debug files
 tferr.txt
 tfschema.json
+tf_schema_err.txt
 
 # tfvars with actual values (keep example)
 terraform.tfvars
