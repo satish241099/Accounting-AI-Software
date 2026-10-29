@@ -1,0 +1,144 @@
+# Per-environment values for Malaysia Accounting SaaS Helm chart
+# Overrides for dev environment
+
+# Global values
+image:
+  tag: "dev-latest"  # CI should pin to dev-specific digest
+
+global:
+  env: "dev"
+  # Placeholder values - Cloud Engineer replaces these with concrete values
+  subnetIds: "PLACEHOLDER_SUBNET_IDS_DEV"
+  securityGroupIds: "PLACEHOLDER_SG_IDS_DEV"
+  eksEndpoint: "PLACEHOLDER_EKS_ENDPOINT_DEV"
+  irsaRoleArn: "PLACEHOLDER_DEV_IRSA_ROLE_ARN"
+  rdsCaBundle: "PLACEHOLDER_RDS_CA_BUNDLE_DEV"
+
+# Replica counts for dev (can scale lower)
+replicaCount:
+  web: 1
+  api: 1
+  worker: 1
+  pgbouncer: 1
+
+# Resource requests/limits for dev (smaller for cost discipline)
+resources:
+  web:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  api:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "400m"
+      memory: "512Mi"
+  worker:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  pgbouncer:
+    requests:
+      cpu: "25m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+
+# HPA configuration for dev (lower max replicas)
+hpa:
+  web:
+    minReplicas: 1
+    maxReplicas: 2
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  api:
+    minReplicas: 2
+    maxReplicas: 4
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  worker:
+    minReplicas: 1
+    maxReplicas: 2
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  pgbouncer:
+    enabled: false
+
+# KEDA configuration for dev (lower thresholds)
+keda:
+  api:
+    triggers:
+      - type: prometheus
+        metadata:
+          metricName: "http_requests_per_second"
+          query: 'sum(rate(http_requests_total{service="api"}[1m])) by (pod)'
+          threshold: "50"  # Lower threshold for dev
+  worker:
+    triggers:
+      - type: prometheus
+        metadata:
+          metricName: "filing_queue_depth"
+          query: 'sum(filing_queue_pending_jobs) by (pod)'
+          threshold: "5"  # Lower threshold for dev
+
+# PodDisruptionBudget for dev
+pdb:
+  web:
+    enabled: true
+    minAvailable: 1
+  api:
+    enabled: true
+    minAvailable: 1
+  worker:
+    enabled: true
+    minAvailable: 1
+  pgbouncer:
+    enabled: true
+    minAvailable: 1
+
+# NetworkPolicy for dev (more restrictive egress)
+networkPolicy:
+  enabled: true
+
+# Node selection for dev (dev node pool)
+nodeSelector:
+  node-type: "dev"
+
+# TLS for dev
+tls:
+  mode: "require"
+
+# External Secret names for dev
+externalSecret:
+  # Secret names follow pattern: db/dev/postgres and db/dev/admin
+  secretNames:
+    postgres: "db/dev/postgres"
+    admin: "db/dev/admin"
+
+# Migration configuration for dev
+migration:
+  image:
+    tag: "dev-latest"  # CI pins dev-specific migration image

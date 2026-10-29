@@ -1,0 +1,142 @@
+# Per-environment values for Malaysia Accounting SaaS Helm chart
+# Overrides for staging environment
+
+# Global values
+image:
+  tag: "staging-latest"  # CI should pin to staging-specific digest
+
+global:
+  env: "staging"
+  subnetIds: "PLACEHOLDER_SUBNET_IDS_STAGING"
+  securityGroupIds: "PLACEHOLDER_SG_IDS_STAGING"
+  eksEndpoint: "PLACEHOLDER_EKS_ENDPOINT_STAGING"
+  irsaRoleArn: "PLACEHOLDER_STAGING_IRSA_ROLE_ARN"
+  rdsCaBundle: "PLACEHOLDER_RDS_CA_BUNDLE_STAGING"
+
+# Replica counts for staging (production-like but smaller)
+replicaCount:
+  web: 2
+  api: 2
+  worker: 2
+  pgbouncer: 1
+
+# Resource requests/limits for staging (medium)
+resources:
+  web:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  api:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  worker:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  pgbouncer:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+# HPA configuration for staging (medium replicas)
+hpa:
+  web:
+    minReplicas: 2
+    maxReplicas: 4
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  api:
+    minReplicas: 2
+    maxReplicas: 6
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  worker:
+    minReplicas: 2
+    maxReplicas: 4
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  pgbouncer:
+    enabled: false
+
+# KEDA configuration for staging (production thresholds)
+keda:
+  api:
+    triggers:
+      - type: prometheus
+        metadata:
+          metricName: "http_requests_per_second"
+          query: 'sum(rate(http_requests_total{service="api"}[1m])) by (pod)'
+          threshold: "100"
+  worker:
+    triggers:
+      - type: prometheus
+        metadata:
+          metricName: "filing_queue_depth"
+          query: 'sum(filing_queue_pending_jobs) by (pod)'
+          threshold: "10"
+
+# PodDisruptionBudget for staging
+pdb:
+  web:
+    enabled: true
+    minAvailable: 1
+  api:
+    enabled: true
+    minAvailable: 1
+  worker:
+    enabled: true
+    minAvailable: 1
+  pgbouncer:
+    enabled: true
+    minAvailable: 1
+
+# NetworkPolicy for staging
+networkPolicy:
+  enabled: true
+
+# Node selection for staging
+nodeSelector:
+  node-type: "staging"
+
+# TLS for staging
+tls:
+  mode: "require"
+
+# External Secret names for staging
+externalSecret:
+  secretNames:
+    postgres: "db/staging/postgres"
+    admin: "db/staging/admin"
+
+# Migration configuration for staging
+migration:
+  image:
+    tag: "staging-latest"

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: accounting-saas
+description: Helm chart for Malaysia Accounting SaaS Kubernetes runtime (Workstream 2)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

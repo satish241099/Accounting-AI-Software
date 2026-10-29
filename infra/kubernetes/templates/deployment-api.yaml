@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "accounting-saas.fullname" . }}-api
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.replicaCount.api }}
+  selector:
+    matchLabels:
+      {{- include "accounting-saas.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0  # Zero unavailable during rollout for zero dropped requests
+  template:
+    metadata:
+      labels:
+        {{- include "accounting-saas.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api
+      annotations:
+        {{- if .Values.serviceAccount.annotations }}
+        eks.amazonaws.com/role-arn: {{ .Values.serviceAccount.annotations.eks.amazonaws.com/role-arn }}
+        {{- end }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: api
+          image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "{{ .Values.global.env }}"
+            - name: PORT
+              value: "4000"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "accounting-saas.fullname" . }}-db-config
+                  key: database_url
+            - name: PGSSLMODE
+              value: "{{ .Values.tls.mode }}"
+            - name: PGSSLROOTCERT
+              value: "/etc/ssl/certs/rds-ca-bundle.pem"
+          envFrom:
+            - secretRef:
+                name: {{ include "accounting-saas.fullname" . }}-app-config
+          resources:
+            {{- toYaml .Values.resources.api | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+            successThreshold: {{ .Values.probes.liveness.successThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /api/readyz
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            successThreshold: {{ .Values.probes.readiness.successThreshold }}
+          volumeMounts:
+            - name: rds-ca-bundle
+              mountPath: /etc/ssl/certs/rds-ca-bundle.pem
+              subPath: rds-ca-bundle.pem
+              readOnly: true
+      volumes:
+        - name: rds-ca-bundle
+          configMap:
+            name: {{ .Values.rdsCa.name }}
+            items:
+              - key: rds-ca-bundle.pem
+                path: rds-ca-bundle.pem

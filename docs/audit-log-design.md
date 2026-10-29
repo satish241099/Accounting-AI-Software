@@ -3,6 +3,7 @@
 **Date:** 2026-10-24
 **Status:** Design Proposal v0.1 — pending Data Lead review
 **Feature:** F-MVIJZ4YO-002C-17YV → Slice SL-MVIJXKP1-001B-5CRH → Milestone MS-MVIJXDQ3-000Z-8FPD → Mission M-MVIJX5F9-000O-MY23
+**Related Test Plan:** `docs/test-strategy/multi-tenant-kernel-auth.md` (KB-018) — Test plan covers audit events with compliance requirements for GDPR/PDPA
 
 ---
 

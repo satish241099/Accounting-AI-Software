@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.rdsCa.name }}
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rds-ca
+data:
+  rds-ca-bundle.pem: |
+{{ .Values.rdsCa.bundleData | indent 4 }}

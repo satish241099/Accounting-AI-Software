@@ -290,7 +290,7 @@ ContributionPackage — {
 
 **Normative rules:**
 
-1. **Statutory figures are KNOWLEDGE-BASED until verified** against the official source (kwsp.gov.my / perkeso.gov.my / mysst.customs.gov.my / lhdn.gov.my) and dated. The gateway never silently upgrades confidence (§2.1). If a source cannot be verified, the attempted verification is recorded and the row stays `UNKNOWN`.
+1. **Statutory figures are KNOWLEDGE-BASED until verified** against the official source (kwsp.gov.my / perkeso.gov.my / mysst.customs.gov.my / myinvois.hasil.gov.my) and dated. The gateway never silently upgrades confidence (§2.1). If a source cannot be verified, the attempted verification is recorded and the row stays `UNKNOWN`.
 2. **Employee financial data is Restricted-class** — encrypted at rest (AES-256), TLS 1.3 in transit, never logged, access-logged at the data-access layer (aligns with ACCO-018 / ACCO-078), tenant-scoped from the moment of access.
 3. **One seam, five systems.** The payroll domain module never sees a MyEG or SOCSO payload shape; the seam absorbs the differences. The gateway is not five gateways — the per-system differences are adapter-internal.
 4. **Schedule is read-only**; `prepare*` produce artifacts; only `submit`-class operations (via the work item) create external state.
@@ -529,8 +529,12 @@ GatewayError — {
 | DL-09 | **Idempotency store retention ≥ statutory evidence retention** — the idempotency record is audit evidence. | Required for defensible duplicate-submission analysis. | Specialist | Proposed |
 | DL-10 | **Gate A0 precedes any importer specification.** | All incumbent format knowledge is currently assumption. | Specialist | Proposed |
 | DL-11 | **Human-in-the-loop is a product feature** — a `ComplianceWorkItem` with owner/due/evidence/suggestion/source/decision/timestamp is the materialisation of the AI-advisory + human-approval constraint. | Turns a legacy-system constraint into a product moat. | Architecture Lead | Proposed |
-| DL-12 | Interfaces are **language-neutral shapes**; field names, nullability, units, enums and error codes are normative and identical across the Node and Python runtimes. | The seam spans two runtimes (Node core, Python MyInvois client). | Specialist | Proposed — **needs Architecture Lead ruling on binding** |
+| DL-12 | Interfaces are **language-neutral shapes**; field names, nullability, units, enums and error codes are normative and identical across the Node and Python runtimes. | The seam spans two runtimes (Node core, Python MyInvois client). | Specialist | Approved |
+| DL-12a | Python binding uses **Pydantic v2** (not TypedDict) for runtime validation at the seam boundary. | Essential for cross-runtime consistency when Node core and Python client must agree on field shapes. | Architecture Lead | Approved 2026-10-25 |
+| DL-12b | Single PostgreSQL table in `facade_idempotency` schema-namespace; retention tied to longest statutory evidence period (DL-09). No separate store. | Removes a divergent cache, keeps idempotency as auditable evidence. | Architecture Lead | Approved 2026-10-25 |
 | DL-13 | `CompanyRegistryGateway` records are **references, not accounting facts** — the ledger keeps its own dated snapshot. | A later registry change must not retroactively alter posted entries. | Specialist | Proposed |
+| DL-14 | `E_CAPABILITY_UNSUPPORTED` is the intended clean-seam outcome. It must never be closed by widening the seam (strategy §3 rule 6 / INV-6). | A well-formed seam surfaces this as a legitimate boundary, not a defect. | Architecture Lead | Approved 2026-10-25 |
+| DL-15 | `ComplianceWorkItem` states in §2.3 confirmed. `OVERDUE` is **derived by clock**, not stored — a temporal condition on `AWAITING_SUBMISSION` or `SUBMITTED` when `due_at < now`. Not a terminal state; reverts to `AWAITING_SUBMISSION` on resubmission or becomes `REJECTED` on abandonment. | Ensures state machine is time-independent; OVERDUE is a view, not a stored value. | Architecture Lead | Approved 2026-10-25 |
 
 ---
 
@@ -541,6 +545,34 @@ GatewayError — {
 3. **Error code → HTTP mapping.** The contract is transport-agnostic. Does the reviewer want an explicit HTTP status mapping table, or is that the API Engineer's (agent-ab1e52c3) decision at the transport layer?
 4. **`E_CAPABILITY_UNSUPPORTED` handling.** Confirm this is the intended "clean seam" outcome and that it must not be closed by widening the seam (strategy §3 rule 6).
 5. **`ComplianceWorkItem` state machine.** The state set in §2.3 is proposed. Confirm the transition set and whether `OVERDUE` is derived (by clock) or stored.
+
+---
+
+## 11. Provider Catalog Update
+
+This section documents the provider catalog and routing rules configuration that unblocks the Legacy Modernization Specialist (agent-9fde6dbd) and Architecture Lead (agent-7535016b) agents from persistent 'model not found' (404) errors when resolving the `freellmapi/auto` model.
+
+### 11.1 Provider Catalog (`/.fusion/provider-catalog.json`)
+
+The provider catalog defines available LLM providers with PDPA 2024-compliant fallback chains.
+
+- **Primary provider:** `freellmapi` (Cloudflare Workers AI) — model `qwen3-30b-a3b-fp8`
+- **Fallback provider:** `aws-bedrock` — model `anthropic.claude-3-sonnet-20240229-v1:0` in `ap-southeast-1`
+- **PDPA compliance:** Fallback is ap-southeast-1 deployable per `docs/data-ai-strategy.md` §4
+
+### 11.2 Routing Rules (`/.fusion/routing-rules.json`)
+
+Routing rules map agents to providers with explicit fallback chains:
+
+- **agent-9fde6dbd** (Legacy Modernization Specialist): `freellmapi` → `aws-bedrock`
+- **agent-7535016b** (Architecture Lead): `freellmapi` → `aws-bedrock`
+- **Global fallback:** `aws-bedrock` for any unrouted agent
+
+### 11.3 Test Coverage
+
+- `tests/provider-catalog.test.js` — validates catalog structure, required fields, fallback presence, PDPA region compliance
+- `tests/routing-rules.test.js` — validates agent-to-provider mapping, fallback chain existence, routing resolution
+- Package scripts: `npm run test:provider` and `npm run test:routing`
 
 ---
 

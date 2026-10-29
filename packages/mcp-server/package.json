@@ -1,0 +1,30 @@
+{
+  "name": "@malaysia-accounting/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for Malaysia Accounting SaaS — compliance-focused tool handlers with Zod contracts and dual stdio/Streamable HTTP transports",
+  "private": true,
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start:stdio": "ts-node --transpile-only src/server.ts stdio",
+    "start:http": "ts-node --transpile-only src/server.ts http",
+    "test": "vitest run",
+    "lint": "eslint --ext .ts src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.4",
+    "zod-to-json-schema": "^3.24.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "vitest": "^1.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  }
+}

@@ -1,0 +1,16 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "accounting-saas.fullname" . }}-worker
+  labels:
+    {{- include "accounting-saas.labels" . | nindent 4 }}
+    app.kubernetes.io/component: filing-worker
+spec:
+  scaleTargetRef:
+    name: {{ include "accounting-saas.fullname" . }}-worker
+  pollingInterval: {{ .Values.keda.worker.pollingInterval }}
+  cooldownPeriod: {{ .Values.keda.worker.cooldownPeriod }}
+  minReplicaCount: {{ .Values.hpa.worker.minReplicas }}
+  maxReplicaCount: {{ .Values.hpa.worker.maxReplicas }}
+  triggers:
+    {{- toYaml .Values.keda.worker.triggers | nindent 4 }}

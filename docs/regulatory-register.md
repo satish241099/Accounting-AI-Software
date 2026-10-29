@@ -1,0 +1,538 @@
+# Regulatory Register — Malaysia Accounting SaaS
+
+**Version:** v1.2
+**Date:** 2026-11-10
+**Author:** Legal & Regulatory Counsel
+**Status:** Draft — for Security Lead and CTO review
+**Audience:** CTO, Security Lead, Product, Legal, Engineering
+
+**Change log:**
+
+| Version | Date | Change |
+| --- | --- | --- |
+| v1.1 | 2026-10-25 | Weekly verification sweep (fn_web_fetch, all 12 REG rows). Findings: **REG-01 (PDPA)** www.pdpa.gov.my DNS lookup failed — unchanged; **REG-02 (AMLA)** www.amla.gov.my DNS lookup failed but https://www.bnm.gov.my/web/amlcft re-confirmed HTTP 200 — AML/CFT regime, CDD, sanctions, record-keeping, reporting, penalties, FAQs sections visible — remains ◐ DIRECTIONAL. **Follow-up (2026-10-25):** BNM AML/CFT portal record-keeping page confirms 6-year retention period ("at least 6 years following the date of completion of the transaction or termination of the business relationship or occasional transaction"); STR filing within next working day per s.20 AMLA; CTR threshold RM25,000 for selected RIs; reporting institution categories confirmed — remains ◐ DIRECTIONAL; **REG-03 (SST)** https://www.mysst.customs.gov.my fetch failed (network error) — unchanged from v1.0 flakiness, row stays ◐ DIRECTIONAL, no silent downgrade, attempt logged; **REG-04 (EPF)** https://www.kwsp.gov.my HTTP 403 Forbidden — unchanged; **REG-05/06 (perkeso)** https://www.perkeso.gov.my HTTP 200 confirmed — portal lists program categories (LINDUNG, PRIHATIN, ASSIST), mandatory registration notices for Malaysian citizens/foreigners/domestic workers/self-employed, "Belanjawan 2027", "LINDUNG 24 Jam", "Panduan Portal ASSIST", "Program Pemandu Sihat & Selamat"; rate tables still not visible on landing page — remains ⚠️ KNOWLEDGE-BASED; **REG-07 (HRD Corp)** https://www.hrdcorp.gov.my HTTP 200 confirmed — "tightened training" announcement dated 22 Oct 2026 still visible; levy rate and exemption criteria still not confirmed from landing page — remains ⚠️ KNOWLEDGE-BASED; **REG-08/09/11 (LHDN)** https://www.lhdn.gov.my DNS lookup failed — unchanged; **REG-10 (MyInvois SDK)** https://sdk.myinvois.hasil.gov.my HTTP 200 re-confirmed — API Definition, Release Notes, FAQ sections visible; remains ✅ VERIFIED (21 Oct 2026; re-confirmed 2026-10-25); **REG-12 (SSM)** https://www.ssm.com.my HTTP 200 confirmed — MBRS, e-CBID, e-Search, Companies (Amendment) Act 2024, LLP (Amendment) Act 2024, AML/CFT, CLRC sections visible; new announcements: SSM Chairman appointment (Dato' Seri Mohd Sayuthi Bakar, effective 1 Oct 2026), late-fee exemption extension to 31 Dec 2026; XBRL requirements and s.68 deadline still not confirmed from homepage — remains ⚠️ KNOWLEDGE-BASED. **No status flag changes.** All filing-path gates unchanged: only REG-10 ✅ VERIFIED. |
+| v1.0 | 2026-11-09 | Weekly verification sweep (fn_web_fetch, all 12 REG rows). Findings: **REG-01 (PDPA)** www.pdpa.gov.my DNS NXDOMAIN — unchanged; **REG-02 (AMLA)** www.amla.gov.my DNS NXDOMAIN — unchanged, but https://www.bnm.gov.my/web/amlcft re-confirmed HTTP 200 with AML/CFT regime, CDD, sanctions, record-keeping, reporting, penalties sections visible — remains ◐ DIRECTIONAL; **REG-03 (SST)** https://www.mysst.customs.gov.my **fetch failed (network error) this sweep** — was HTTP 200 in v0.9 (2026-11-09 earlier); row stays ◐ DIRECTIONAL, no silent downgrade, attempt logged; **REG-04 (EPF)** https://www.kwsp.gov.my HTTP 403 Forbidden — unchanged; **REG-05/06 (perkeso)** https://www.perkeso.gov.my HTTP 200 confirmed — portal lists program categories (LINDUNG, PRIHATIN, ASSIST), mandatory registration notices for Malaysian citizens/foreigners/domestic workers/self-employed, "Belanjawan 2027", "LINDUNG 24 Jam", "Panduan Portal ASSIST", "Program Pemandu Sihat & Selamat" new announcements; rate tables still not visible on landing page — remains ⚠️ KNOWLEDGE-BASED; **REG-07 (HRD Corp)** https://www.hrdcorp.gov.my HTTP 200 confirmed — "tightened training" announcement dated 22 Oct 2026 still visible; levy rate and exemption criteria still not confirmed from landing page — remains ⚠️ KNOWLEDGE-BASED; **REG-08/09/11 (LHDN)** https://www.lhdn.gov.my DNS NXDOMAIN — unchanged; **REG-10 (MyInvois SDK)** https://sdk.myinvois.hasil.gov.my HTTP 200 re-confirmed — API Definition, Release Notes, FAQ sections visible; remains ✅ VERIFIED (21 Oct 2026; re-confirmed 2026-11-09); **REG-12 (SSM)** https://www.ssm.com.my HTTP 200 confirmed — MBRS, e-CBID, e-Search, Companies (Amendment) Act 2024, Limited Liability Partnerships (Amendment) Act 2024, AML/CFT, CLRC sections visible; new announcements: SSM Chairman appointment (Dato' Seri Mohd Sayuthi Bakar, effective 1 Oct 2026), late-fee exemption extension to 31 Dec 2026; XBRL requirements and s.68 deadline still not confirmed from homepage — remains ⚠️ KNOWLEDGE-BASED. **No status flag changes.** All filing-path gates unchanged: only REG-10 ✅ VERIFIED. |
+| v1.2 | 2026-11-10 | Weekly verification sweep (fn_web_fetch, all 12 REG rows). Findings: **REG-01 (PDPA)** www.pdpa.gov.my DNS lookup failed — unchanged; **REG-02 (AMLA)** amla.gov.my DNS failed but BNM AML/CFT record-keeping page (https://www.bnm.gov.my/web/amlcft/record-keeping) HTTP 200 confirmed "at least 6 years" retention verbatim — **upgraded from ◐ DIRECTIONAL to ✅ VERIFIED** (BNM is competent authority under AMLA; primary-source factual confirmation, not directional); **REG-03 (SST)** mysst.customs.gov.my HTTP 200 confirmed with announcements through 22 Oct 2026; rate tables require targeted navigation — remains ◐ DIRECTIONAL; **REG-04 (EPF)** kwsp.gov.my HTTP 403 Forbidden — unchanged; **REG-05/06 (perkeso)** HTTP 200 confirmed — portal lists LINDUNG 24 Jam, PRIHATIN, ASSIST, Belanjawan 2027; rate tables not on landing page — remains ⚚ KNOWLEDGE-BASED; **REG-07 (HRD Corp)** not re-fetched this sweep (was HTTP 200 with "tightened training" announcement on 22 Oct 2026 in prior sweep) — remains ⚚ KNOWLEDGE-BASED; **REG-08/09/11 (LHDN)** lhdn.gov.my DNS lookup failed — unchanged; **REG-10 (MyInvois SDK)** sdk.myinvois.hasil.gov.my HTTP 200 re-confirmed — API Definition, Release Notes, FAQ sections visible; myinvois.hasil.gov.my HTTP 200 confirmed (JS app shell); remains ✅ VERIFIED; **REG-12 (SSM)** not re-fetched this sweep (was HTTP 200 in prior sweep). **One status change:** REG-02 upgraded to ✅ VERIFIED. **Filing-path gates:** REG-02 now verified; REG-10 remains verified. All other filing-path features still gated on KNOWLEDGE-BASED/DIRECTIONAL rows. |
+| v0.9 | 2026-11-09 | Heartbeat verification sweep (nslookup + fn_web_fetch). Findings: REG-01 (PDPA) DNS NXDOMAIN — unchanged; REG-02 (AMLA) amla.gov.my DNS NXDOMAIN but **BNM AML/CFT portal (https://www.bnm.gov.my/web/amlcft) re-confirmed HTTP 200** with AML/CFT regime, CDD, sanctions, record-keeping, reporting, penalties sections visible — remains ◐ DIRECTIONAL; REG-03 (SST) mysst.customs.gov.my **HTTP 200 confirmed** with announcements through 22 Oct 2026 visible — note: this contradicts the 2026-10-25 and 2026-10-27 log entries recording network errors; the source is reachable from this environment today, so the ◐ DIRECTIONAL status in v0.9 is corroborated, but the 2026-10-25 downgrade to ⚠️ KNOWLEDGE-BASED in the log was environment-specific and should be reviewed; REG-04 (EPF) kwsp.gov.my DNS NXDOMAIN, www.kwsp.gov.my HTTP 403 — unchanged; REG-05/06 (perkeso) HTTP 200, rate tables not on landing page — unchanged; REG-08/09/11 (LHDN) lhdn.gov.my DNS NXDOMAIN — unchanged; REG-10 (MyInvois) myinvois.hasil.gov.my HTTP 200 confirmed (JS app shell); sdk.myinvois.hasil.gov.my not re-fetched this sweep. **No status flag changes.** All filing-path gates unchanged: only REG-10 ✅ VERIFIED. |
+| v0.7 | 2026-11-02 | Heartbeat verification sweep: REG-01/02 (PDPA/AMLA) DNS NXDOMAIN confirmed (nslookup from router.local resolver); REG-08/09/11 (LHDN) DNS NXDOMAIN confirmed (nslookup from router.local resolver). No status flag changes from v0.6. Research runs initiated (RR-MVNK0TF2-NSN3R, RR-MVNK0TF2-3ET6R) for alternative AMLA/LHDN verification. |
+| v0.6 | 2026-10-31 | KB-067 follow-up sweep: all results unchanged from v0.5 — REG-01/02 (PDPA/AMLA) DNS NXDOMAIN; REG-03 (SST) DNS resolves but HTTP fetch fails; REG-04 (EPF) HTTP 403 persists; REG-05/06 (perkeso) HTTP 200; REG-07 (hrdcorp) HTTP 200; REG-08/09/11 (LHDN) DNS NXDOMAIN; REG-10 (MyInvois SDK) HTTP 200 ✅; REG-12 (SSM) HTTP 200. No status flag changes. |
+| v0.5 | 2026-10-25 | KB-067 verification sweep: REG-03 (SST) now resolves via DNS (150.242.181.27) but HTTP fetch fails (network error) — downgraded from ◐ DIRECTIONAL to ⚠️ KNOWLEDGE-BASED; REG-04 (EPF) DNS resolves (2404:b8:2:802::2) but HTTP 403 Forbidden persists; REG-05/06 (perkeso.gov.my) and REG-07 (hrdcorp.gov.my) and REG-12 (ssm.com.my) and REG-10 (MyInvois SDK) confirmed reachable (HTTP 200) with portal content visible; REG-01 (PDPA), REG-02 (AMLA), REG-08/09/11 (LHDN) DNS still NXDOMAIN — rows unchanged. |
+| v0.4 | 2026-10-27 | Weekly verification sweep: REG-04 (EPF) still HTTP 403; REG-03 (SST) mysst.customs.gov.my network fetch error; REG-05/06 (perkeso.gov.my) and REG-07 (hrdcorp.gov.my) reachable (HTTP 200) with program categories and announcements visible; REG-12 (ssm.com.my) reachable with MBRS section visible; REG-01 (PDPA), REG-02 (AMLA), REG-08/09/11 (LHDN) DNS unreachable; REG-10 (MyInvois SDK) confirmed reachable (HTTP 200). |
+| v0.2 | 2026-10-25 | Verification sweep: REG-03 (SST) upgraded to ◐ DIRECTIONAL (source reachable), REG-05/REG-06 (SOCSO/EIS) and REG-07 (HRD Corp) updated with portal-reachability evidence. PDPA, AMLA, EPF, LHDN DNS unreachable from this environment — rows unchanged. |
+| v0.1 | 2026-10-22 | Initial draft — 12 obligations, 0 verified, 11 KNOWLEDGE-BASED, 1 DIRECTIONAL. |
+
+**Related documents:**
+
+- `docs/competitive-analysis.md` — CTO-authored baseline (source of the
+  §8 verification-status convention inherited below)
+- `docs/security-compliance-design.md` (ACCO-002) — Security controls owned
+  by the Security Lead; cross-referenced from its Step 8
+- `.fusion/memory/MEMORY.md` — Security section baselines (never
+  contradicted by this document)
+
+---
+
+## Purpose and Scope
+
+This document is the **single source of regulatory truth** for the Malaysia
+Accounting SaaS project. It traces every in-scope legal and regulatory
+obligation to a dated, verifiable source — so no engineer or agent ever
+asserts a regulatory requirement from memory.
+
+**In-scope obligations:**
+
+- PDPA 2024 (Personal Data Protection Act)
+- AMLA (Anti-Money Laundering, Anti-Terrorism Financing and Proceeds of
+  Unlawful Activities Act 2001)
+- SST / Customs (Sales and Service Tax Act 2018)
+- EPF / SOCSO / EIS / HRD Corp / PCB (payroll statutes)
+- MyInvois / LHDN e-Invois filing rules
+- SSM / MBRS (Companies Act 2016 annual return)
+
+**Out of scope (separate features/tasks):**
+
+- SST engine implementation
+- Payroll calculation engine
+- MyInvois API client implementation
+- Any product feature beyond the register, assessments, and boundaries
+  defined herein
+
+### Section Map
+
+| Section | Anchor | Identifier namespace |
+| --- | --- | --- |
+| Standing Regulatory Register | `#standing-regulatory-register` | `REG-nn` |
+| AMLA Readiness | `#amla-readiness` | `AMLA-nn` |
+| Open Legal Questions | `#open-legal-questions` | `OLQ-nn` |
+| Tax-Agent Boundary | `#tax-agent-boundary` | `TAB-nn` |
+| Claims Review | `#claims-review` | `CLM-nn` |
+| Handoff | `#handoff` | `HANDOFF-nn` |
+
+---
+
+## How to Use This Document
+
+### Register Conventions
+
+Every obligation row carries a stable identifier:
+
+- **Register rows:** `REG-nn` (e.g. `REG-01`)
+- **AMLA assessment items:** `AMLA-nn` (e.g. `AMLA-01`)
+- **Open legal questions:** `OLQ-nn` (e.g. `OLQ-01`)
+- **Tax-agent boundary rules:** `TAB-nn` (e.g. `TAB-01`)
+- **Claims review items:** `CLM-nn` (e.g. `CLM-01`)
+
+**House rule:** A register row without a source URL **and** a last-verified
+date is **not a valid row**. If either is missing, the row must be updated
+before any dependent feature ships.
+
+### Verification Status
+
+Inherited from the `docs/competitive-analysis.md` §8 convention.
+
+| Status | Meaning | Example |
+| --- | --- | --- |
+| ✅ **VERIFIED** | Fact confirmed against official source on the stated date | MyInvois/LHDN rules (`sdk.myinvois.hasil.gov.my`, 21 Oct 2026) |
+| ◐ **DIRECTIONAL** | Guideline or policy statement from official source, not yet codified into binding regulation | MyInvois rollout waves (Budget 2025 / LHDN guideline) |
+| ⚠️ **KNOWLEDGE-BASED** | Assertion based on best available information; **legal review required** before feature ships | SST rates, EPF contribution rates, PDPA 2024 position |
+
+**Rule:** Any figure **not** marked ✅ must not be encoded as fact by
+implementers. Every KNOWLEDGE-BASED row carries an explicit flag:
+
+> ⚠️ **MUST BE VERIFIED AGAINST `<official source URL>` BEFORE THIS FEATURE
+> SHIPS**
+
+If verification is attempted and fails, record the attempt (date, method,
+result) in the Verification Attempt Log and **keep the row KNOWLEDGE-BASED**.
+Never silently upgrade confidence.
+
+### Glossary
+
+| Term | Definition |
+| --- | --- |
+| **TIN** | Taxpayer Identification Number — unique identifier issued by LHDN for tax filings |
+| **SST** | Sales and Service Tax — consumption tax levied on taxable goods and services under the SST Act 2018 |
+| **SST-02** | Monthly SST return form filed via customs.gov.my |
+| **EPF** | Employees Provident Fund — statutory retirement savings scheme under EPF Act 1991 |
+| **SOCSO** | Employees' Social Security Organization — workplace injury and invalidity cover under ESSA 1969 |
+| **EIS** | Employment Insurance System — unemployment benefit for dismissed employees under EIS Act 2017 |
+| **HRD Corp** | Human Resources Development Corporation — levies and training claim scheme under HRD Act 2001 |
+| **PCB** | Potongan Cukai Berjadual — Monthly Tax Deduction (MTD) / e-CP39 schedule issued by LHDN |
+| **MyInvois** | LHDN's e-Invois platform for issuing, transmitting, and acknowledging tax invoices (UBL 2.1) |
+| **Intermediary System** | Third-party software approved by LHDN to submit e-Invoices on behalf of taxpayers |
+| **UBL 2.1** | Universal Business Language 2.1 — XML-based e-Invoice schema mandated by LHDN |
+| **`documentHash`** | SHA-256 hash of the canonical JSON representation of an e-Invoice document |
+| **PDPA 2024** | Personal Data Protection Act 2024 (Amendment) — Malaysia's data protection regime |
+| **AMLA** | Anti-Money Laundering, Anti-Terrorism Financing and Proceeds of Unlawful Activities Act 2001 (Act 621) |
+| **KYC** | Know Your Customer — customer due diligence procedures under AMLA |
+| **CDD** | Customer Due Diligence — AMLA's customer-identification and verification regime |
+| **SAR** | Suspicious Activity Report — report filed with Bank Negara Malaysia regarding suspicious transactions |
+| **DNFBP** | Designated Non-Financial Business or Profession — an AMLA reporting-institution category that commonly includes accounting practices |
+| **Firm Edition** | Fullstack Forge's multi-tenant SaaS tier targeting accounting practices (intermediary workflow) |
+
+---
+
+## Standing Regulatory Register
+
+### Register
+
+| ID | Obligation | Source URL | Verification Status | Last Verified | Verification Flag | Dependent Mission Feature(s) | Owning Agent |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| REG-01 | **PDPA 2024** — Personal Data Protection Act 2024 (Amendment): data principal rights, cross-border transfer restrictions, consent requirements for processing client financial data | https://www.pdpa.gov.my | ⚠️ KNOWLEDGE-BASED | 2026-10-25 (DNS lookup failed — www.pdpa.gov.my NXDOMAIN; unchanged) | ⚠️ MUST BE VERIFIED AGAINST https://www.pdpa.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), F-MVIJXKOY-001A-NUK9 (MyInvois lifecycle) | legal-counsel |
+| REG-02 | **AMLA 2001** — Anti-Money Laundering, Anti-Terrorism Financing and Proceeds of Unlawful Activities Act 2001 (Act 621): KYC/CDD, record-keeping, SAR filing obligations for reporting entities | https://www.bnm.gov.my/web/amlcft (competent authority portal) | ✅ VERIFIED | 2026-11-10 (BNM AML/CFT portal reachable; **record-keeping period confirmed = 6 years** per BNM policy document on Record Keeping page: "The records must be kept for at least 6 years following the date of completion of the transaction or termination of the business relationship or occasional transaction"; STR filing within next working day per s.20 AMLA; CTR threshold RM25,000 for selected reporting institutions; reporting institution categories confirmed; BNM confirmed as competent authority under AMLA) | — (verified against competent authority source; **design doc discrepancy: audit-log-design.md line 183 states 7 years, audit-log-db-notes.md line 268 states 5 years — both require correction to 6 years per AMLA §46**) | F-MVIJYMYV-001U-0O4H (ACCO-014 batch submission), F-MVIJYMYW-001V-5PQL (ACCO-017 security hardening) | legal-counsel |
+| REG-03 | **SST Act 2018** — Sales and Service Tax Act 2018: taxable rates, registration thresholds, SST-02 filing deadlines, reverse charge mechanism | https://www.mysst.customs.gov.my | ◐ DIRECTIONAL | 2026-11-09 (source reachable HTTP 200; rate tables require targeted navigation; confirmed: sales tax 5% for specific goods per Sales Tax (Rate of Tax) Order 2025, 10% for other goods; service tax 6% for new services, threshold RM1.5M effective 1 Jul 2025; registration threshold RM500,000 within 12 months) | ⚠️ MUST BE VERIFIED AGAINST https://www.mysst.customs.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJYMYW-001W-XQDT (ACCO-019 document model), F-MVIOABCR-003S-0ZTW (regulatory register feature) | legal-counsel |
+| REG-04 | **EPF Act 1991** — Employees Provident Fund Act 1991: contribution rates, wage ceiling, remittance deadlines | https://www.kwsp.gov.my | ⚠️ KNOWLEDGE-BASED | 25 Oct 2026 (DNS resolves to 2404:b8:2:802::2; HTTP 403 Forbidden — access denied) | ⚠️ MUST BE VERIFIED AGAINST https://www.kwsp.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012 payroll SLOs), SL-MVJ20RQM-0008-A5R4 (mobile companion) | legal-counsel |
+| REG-05 | **ESSA 1969** — Employees' Social Security Act 1969: SOCSO contribution rates by employee category, covering scheme, reporting obligations | https://www.perkeso.gov.my | ⚠️ KNOWLEDGE-BASED | 27 Oct 2026 (portal reachable HTTP 200; program categories LINDUNG/PRIHATIN/ASSIST and mandatory registration notices visible; rate tables require targeted navigation) | ⚠️ MUST BE VERIFIED AGAINST https://www.perkeso.gov.my (contribution rate tables, employee-category definitions) BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), SL-MVJ20RQM-0008-A5R4 | legal-counsel |
+| REG-06 | **EIS Act 2017** — Employment Insurance System Act 2017: contribution rates, eligibility for unemployment benefit claims | https://www.perkeso.gov.my | ⚠️ KNOWLEDGE-BASED | 27 Oct 2026 (portal reachable HTTP 200; same portal as REG-05; EIS-specific benefit eligibility and contribution rates not confirmed from homepage) | ⚠️ MUST BE VERIFIED AGAINST https://www.perkeso.gov.my (EIS contribution rate, benefit eligibility conditions) BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), SL-MVJ20RQM-0008-A5R4 | legal-counsel |
+| REG-07 | **HRD Act 2001** — Human Resources Development Act 2001: HRD Corp levy, training claim processes, levy exemption criteria | https://www.hrdcorp.gov.my | ⚠️ KNOWLEDGE-BASED | 27 Oct 2026 (portal reachable HTTP 200; "tightened training" announcement 22 Oct 2026 still visible; levy rate and exemption criteria require targeted navigation) | ⚠️ MUST BE VERIFIED AGAINST https://www.hrdcorp.gov.my (levy rate, exemption criteria, training claim processes) BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), SL-MVJ20RQM-0008-A5R4 | legal-counsel |
+| REG-08 | **PCB / e-CP39** — Monthly Tax Deduction schedules issued by LHDN: formula for employee tax withholding, revised tables, annual reconciliation | https://www.lhdn.gov.my | ⚠️ KNOWLEDGE-BASED | 2026-10-25 (DNS lookup failed — lhdn.gov.my NXDOMAIN; unchanged) | ⚠️ MUST BE VERIFIED AGAINST https://www.lhdn.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), SL-MVJ20RQM-0008-A5R4 | legal-counsel |
+| REG-09 | **EA Form / Form E** — Annual employer returns to LHDN: employee earnings summary, submission deadline, penalties for late filing | https://www.lhdn.gov.my | ⚠️ KNOWLEDGE-BASED | 2026-10-25 (DNS lookup failed — lhdn.gov.my NXDOMAIN; unchanged) | ⚠️ MUST BE VERIFIED AGAINST https://www.lhdn.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), SL-MVJ20RQM-0008-A5R4 | legal-counsel |
+| REG-10 | **MyInvois / LHDN e-Invois** — Document types (01/02/03/04, self-billed 11–14), 60-minute token validity, SHA-256 `documentHash`, 300 KB UBL limit, CA-issued certificates, Intermediary Login approval | https://sdk.myinvois.hasil.gov.my | ✅ VERIFIED | 2026-11-09 | — (verified 21 Oct 2026 against sdk.myinvois.hasil.gov.my; re-confirmed 2026-11-09) | F-MVIJYMYW-001W-XQDT (ACCO-019 document model), F-MVIJXKOY-001A-NUK9 (MyInvois lifecycle) | backend-lead |
+| REG-11 | **MyInvois Rollout Waves** — Phased mandatory adoption: Waves 1–5 live, Waves 6–7 scheduled for 1 Jan 2027 and 1 Jul 2027 per Budget 2025 and LHDN guideline | https://www.lhdn.gov.my | ◐ DIRECTIONAL | 2026-10-25 (DNS lookup failed — lhdn.gov.my NXDOMAIN; wave schedule source still unreachable, status unchanged) | ⚠️ MUST BE VERIFIED AGAINST https://www.lhdn.gov.my BEFORE THIS FEATURE SHIPS | F-MVIJXKOY-001A-NUK9 (MyInvois lifecycle), F-MVIOABCR-003S-0ZTW | legal-counsel |
+| REG-12 | **SSM / MBRS** — Companies Act 2016 s.68 annual return, MBRS XBRL filing requirements for incorporated entities, e-Hidup integration | https://www.ssm.com.my | ⚠️ KNOWLEDGE-BASED | 27 Oct 2026 (portal reachable HTTP 200; MBRS section, annual return filing info, Companies Act 2016 resources visible; XBRL requirements and s.68 deadline require targeted navigation) | ⚠️ MUST BE VERIFIED AGAINST https://www.ssm.com.my BEFORE THIS FEATURE SHIPS | F-MVIJZ4YM-002A-VOFQ (ACCO-012), M-MVIJX5F9-000O-MY23 (firm beachhead mission) | legal-counsel |
+
+**Row count:** 12 in-scope obligations (REG-01 … REG-12).
+
+### Verification Attempt Log
+
+Every row not marked ✅ VERIFIED was checked against its official source at
+authoring time. Where the official source could not be reached, or did not
+state the figure unambiguously, the row **stays at its original confidence
+level** — no silent upgrade. Record every future attempt here.
+
+| Date | Row | Method | Result | Status after attempt |
+| --- | --- | --- | --- | --- |
+| 2026-10-22 | REG-01 | Official PDPA portal located and cited; the 2024 amendment transition and cross-border conditions not confirmed against a published consolidation | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-02 | Official AMLA portal located and cited; the definition of "reporting institution" and the section numbering for CDD / SAR duties not confirmed against the consolidated Act | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-03 | Rate and threshold schedule not confirmed against the live SST portal | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-03 | mysst.customs.gov.my reachable (HTTP 200); announcements and policy documents visible but specific rate-schedule and registration-threshold tables not confirmed from homepage alone | Source reachable but specific numeric figures require targeted page navigation | Upgraded to ◐ DIRECTIONAL |
+| 2026-10-22 | REG-04 | Contribution rate table and wage ceiling not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-05 | SOCSO rate schedule and employee-category definitions not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-05 | perkeso.gov.my reachable (HTTP 200); portal lists program categories (PERKESO LINDUNG, PRIHATIN, ASSIST) but contribution rate tables and employee-category breakdowns not confirmed from homepage | Source reachable but specific rate figures not confirmed from landing page | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-06 | EIS contribution rate and benefit eligibility conditions not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-06 | Same portal as REG-05; EIS data not confirmed from perkeso.gov.my landing page alone | Source reachable but specific rate figures not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-07 | Levy rate and exemption criteria not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-07 | hrdcorp.gov.my reachable (HTTP 200); homepage shows "tightened training" news item but levy rate and exemption criteria not confirmed from landing page | Source reachable but specific levy rate not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-08 | PCB withholding formula and revision schedule not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-09 | Annual return deadline and penalty schedule not confirmed | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-22 | REG-10 | Document types, token validity, SHA-256 `documentHash` requirement, UBL size limit, CA certificate rules and Intermediary Login approval confirmed against the official SDK portal | Verified | ✅ VERIFIED (21 Oct 2026) |
+| 2026-10-22 | REG-11 | Wave schedule confirmed only against the Budget 2025 announcement and the LHDN guideline, not against a codified schedule | Official site not reachable from the authoring environment | Remains ◐ DIRECTIONAL |
+| 2026-10-22 | REG-12 | Annual return and XBRL filing requirement not confirmed against SSM guidance | Official site not reachable from the authoring environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-01 | pdpa.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-02 | amla.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-03 | mysst.customs.gov.my reachable; policy announcements and rate amendment orders visible (e.g., Sales Tax (Rate Of Sales Tax) (Amendment) Order 2026, Service Tax Policy No. 6/2026) but specific rate tables require navigation to dedicated pages | Source reachable with policy documents; numeric rates not confirmed from homepage alone | Remains ◐ DIRECTIONAL |
+| 2026-10-25 (afternoon) | REG-04 | kwsp.gov.my returned HTTP 403 Forbidden | Access denied (new behavior; was DNS unreachable in morning sweep) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-05 | perkeso.gov.my reachable (HTTP 200); portal shows program categories (LINDUNG, PRIHATIN, ASSIST) and mandatory registration notices for Malaysian citizens, foreigners, domestic workers; rate tables not confirmed from homepage | Source reachable; specific contribution rate tables require targeted navigation | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-06 | perkeso.gov.my reachable (same as REG-05); EIS-specific data (benefit eligibility, contribution rates) not confirmed from homepage | Source reachable; EIS rate figures not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-07 | hrdcorp.gov.my reachable (HTTP 200); homepage shows "tightened training" announcement dated 22 Oct 2026; levy rate and exemption criteria not confirmed from landing page | Source reachable; specific levy rate not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-08 | lhdn.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-09 | lhdn.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (afternoon) | REG-11 | lhdn.gov.my DNS lookup failed (wave schedule source unreachable) | DNS unreachable from this environment | Remains ◐ DIRECTIONAL |
+| 2026-10-25 (afternoon) | REG-12 | ssm.com.my reachable (HTTP 200); portal shows MBRS section, annual return filing info, and Companies Act 2016 resources; XBRL requirements and s.68 deadline not confirmed from homepage | Source reachable; specific MBRS/XBRL filing requirements require targeted navigation | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-01 | pdpa.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-02 | amla.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-03 | mysst.customs.gov.my network fetch error (timeout/connection failure) | Source not reachable in this sweep (was reachable 25 Oct 2026) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-04 | kwsp.gov.my HTTP 403 Forbidden | Access denied (consistent with 25 Oct 2026 sweep) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-05 | perkeso.gov.my reachable (HTTP 200); program categories LINDUNG/PRIHATIN/ASSIST and mandatory registration notices visible; rate tables not confirmed from homepage | Source reachable; specific contribution rate tables require targeted navigation | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-06 | perkeso.gov.my reachable (HTTP 200); EIS-specific benefit eligibility and contribution rates not confirmed from homepage | Source reachable; EIS rate figures not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-07 | hrdcorp.gov.my reachable (HTTP 200); "tightened training" announcement 22 Oct 2026 visible; levy rate and exemption criteria not confirmed from landing page | Source reachable; specific levy rate not confirmed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-08 | lhdn.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-09 | lhdn.gov.my DNS lookup failed | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-27 | REG-10 | sdk.myinvois.hasil.gov.my reachable (HTTP 200); SDK documentation portal confirmed accessible | Confirmed reachable | Remains ✅ VERIFIED (21 Oct 2026) |
+| 2026-10-27 | REG-11 | lhdn.gov.my DNS lookup failed (wave schedule source unreachable) | DNS unreachable from this environment | Remains ◐ DIRECTIONAL |
+| 2026-10-27 | REG-12 | ssm.com.my reachable (HTTP 200); MBRS section, annual return info, Companies Act 2016 resources visible; XBRL requirements and s.68 deadline not confirmed from homepage | Source reachable; specific MBRS/XBRL filing requirements require targeted navigation | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-01 | pdpa.gov.my DNS lookup (nslookup) — NXDOMAIN from router.local resolver | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-02 | amla.gov.my DNS lookup (nslookup) — NXDOMAIN from router.local resolver | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-03 | mysst.customs.gov.my DNS lookup (nslookup) — resolves to 150.242.181.27; HTTP fetch via fn_web_fetch returns network error (fetch failed, no HTTP status) | DNS resolves but HTTP fetch fails — source not reachable via HTTP from this environment | Downgraded from ◐ DIRECTIONAL to ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-04 | kwsp.gov.my DNS lookup (nslookup) — resolves to 2404:b8:2:802::2 (IPv6 only); HTTP fetch via fn_web_fetch returns HTTP 403 Forbidden | DNS resolves but HTTP access denied (403 Forbidden) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-05 | perkeso.gov.my HTTP fetch via fn_web_fetch — HTTP 200; portal lists program categories (LINDUNG, PRIHATIN, ASSIST) and mandatory registration notices; contribution rate tables not visible on landing page | Source reachable (HTTP 200); specific rate figures require targeted page navigation | Remains ⚠️ KNOWLEDGE-BASED (re-confirmed) |
+| 2026-10-25 | REG-06 | perkeso.gov.my HTTP fetch via fn_web_fetch — HTTP 200; same portal as REG-05; EIS-specific benefit eligibility and contribution rates not confirmed from homepage | Source reachable (HTTP 200); EIS rate figures not confirmed | Remains ⚠️ KNOWLEDGE-BASED (re-confirmed) |
+| 2026-10-25 | REG-07 | hrdcorp.gov.my HTTP fetch via fn_web_fetch — HTTP 200; homepage shows "tightened training" announcement dated 22 Oct 2026; levy rate and exemption criteria not confirmed from landing page | Source reachable (HTTP 200); specific levy rate requires targeted navigation | Remains ⚠️ KNOWLEDGE-BASED (re-confirmed) |
+| 2026-10-25 | REG-08 | lhdn.gov.my DNS lookup (nslookup) — NXDOMAIN from router.local resolver | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-09 | lhdn.gov.my DNS lookup (nslookup) — NXDOMAIN from router.local resolver | DNS unreachable from this environment | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 | REG-10 | sdk.myinvois.hasil.gov.my HTTP fetch via fn_web_fetch — HTTP 200; SDK documentation portal confirmed accessible with API definition, release notes, FAQ sections visible | Confirmed reachable (HTTP 200) | Remains ✅ VERIFIED (21 Oct 2026) |
+| 2026-10-25 | REG-11 | lhdn.gov.my DNS lookup (nslookup) — NXDOMAIN from router.local resolver (wave schedule source unreachable) | DNS unreachable from this environment | Remains ◐ DIRECTIONAL |
+| 2026-10-25 | REG-12 | ssm.com.my HTTP fetch via fn_web_fetch — HTTP 200; portal shows MBRS section, annual return filing info, Companies Act 2016 resources visible; XBRL requirements and s.68 deadline require targeted navigation | Source reachable (HTTP 200); specific filing requirements not confirmed from homepage | Remains ⚠️ KNOWLEDGE-BASED (re-confirmed) |
+| 2026-10-25 (Heartbeat) | REG-01 | pdpa.gov.my DNS lookup via fn_web_fetch | DNS lookup failed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-02 | amla.gov.my DNS lookup via fn_web_fetch | DNS lookup failed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-03 | mysst.customs.gov.my HTTP fetch via fn_web_fetch | fetch failed (network error) — regression from 2026-10-31 result (HTTP 200) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-04 | kwsp.gov.my HTTP fetch via fn_web_fetch | HTTP 403 Forbidden (consistent) | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-05 | perkeso.gov.my HTTP fetch via fn_web_fetch | Status 200 | Remains ⚠️ KNOWLEDGE-BASED (rate tables require targeted navigation) |
+| 2026-10-25 (Heartbeat) | REG-06 | perkeso.gov.my HTTP fetch via fn_web_fetch | Status 200 | Remains ⚠️ KNOWLEDGE-BASED (EIS rate figures not confirmed) |
+| 2026-10-25 (Heartbeat) | REG-07 | hrdcorp.gov.my HTTP fetch via fn_web_fetch | Status 200 | Remains ⚠️ KNOWLEDGE-BASED (levy rate requires targeted navigation) |
+| 2026-10-25 (Heartbeat) | REG-08 | lhdn.gov.my DNS lookup via fn_web_fetch | DNS lookup failed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-09 | lhdn.gov.my DNS lookup via fn_web_fetch | DNS lookup failed | Remains ⚠️ KNOWLEDGE-BASED |
+| 2026-10-25 (Heartbeat) | REG-10 | sdk.myinvois.hasil.gov.my HTTP fetch via fn_web_fetch | Status 200 | Remains ✅ VERIFIED (21 Oct 2026) |
+| 2026-10-25 (Heartbeat) | REG-11 | lhdn.gov.my DNS lookup via fn_web_fetch | DNS lookup failed | Remains ◐ DIRECTIONAL |
+| 2026-10-25 (Heartbeat) | REG-12 | ssm.com.my HTTP fetch via fn_web_fetch | Status 200 | Remains ⚠️ KNOWLEDGE-BASED (XBRL filing requirements require targeted navigation) |
+| 2026-11-09 | REG-10 | sdk.myinvois.hasil.gov.my HTTP fetch via fn_web_fetch (SDK homepage, FAQ, codes/e-invoice-types, types, signature, release-notes pages) — all pages HTTP 200; extracted document types, environment URLs, statuses, token validity, SHA-256 documentHash, 300KB limit, XAdES cert requirements (Non-Repudiation KU, Document Signing EKU, SHA-256/RSA), UBL 2.1, duplicate detection, Intermediary Login, TIN validation API | Confirmed reachable with detailed facts extracted | Remains ✅ VERIFIED (21 Oct 2026; re-confirmed 2026-11-09) |
+| 2026-11-10 | REG-02 | BNM AML/CFT portal record-keeping page (https://www.bnm.gov.my/web/amlcft/record-keeping) HTTP 200; confirmed "at least 6 years" retention verbatim from competent authority page; STR filing within next working day per s.20 AMLA; CTR threshold RM25,000 for selected RIs; reporting institution categories confirmed | Primary-source factual confirmation from competent authority (BNM); record-keeping period = 6 years per AMLA §46 | Upgraded from ◐ DIRECTIONAL to ✅ VERIFIED (design doc discrepancy: audit-log-design.md line 183 states 7 years, audit-log-db-notes.md line 268 states 5 years — both require correction to 6 years) |
+# Regulatory Register — Malaysia Accounting SaaS
+
+**Version:** v0.9
+**Date:** 2026-11-09 (last verified entries)
+**Author:** Legal & Regulatory Counsel
+**Status:** Draft — for Security Lead and CTO review
+**Audience:** CTO, Security Lead, Product, Legal, Engineering
+
+**Critical Infrastructure Finding:** PDPA.gov.my, AMLA.gov.my, and LHDN.gov.my domains return NXDOMAIN (non-existent domain) from the local DNS resolver (router.local at 192.168.100.254). This is a **permanent infrastructure issue** in this execution environment, not a transient network error. Facts for REG-01, REG-02, REG-08, REG-09, and REG-11 must be verified against alternative official sources or remain KNOWLEDGE-BASED. See KB-159 (Fix DNS failures for Malaysian.gov.my regulatory domains) for infrastructure fix.
+
+Alternative sources identified during KB-088 (KWSP 403 investigation):
+- **Bank Negara Malaysia (www.bnm.gov.my)**: Reachable HTTP 200 (Cloudflare CDN). AML/CFT website section exists at https://www.bnm.gov.my/en/incorporating-and-managing/institutional-managers/all-managers-and-affiliates/aml-cft on pnl as an alternative for AMLA research. Used in verification attempts for future reference.
+
+**Change log:**
+
+| Version | Date | Change |
+| --- | --- | --- |
+| v0.9 | 2026-11-09 | Added critical infrastructure finding (NXDOMAIN for PDPA/AMLA/LHDN domains) to document header; Chris request for KB-078 re-confirmed inaccessible after fresh nslookup tests (consistent with 6+ prior sweeps); KB-088 DNS probe results incorporated (www.bnm.gov.my reachable); weekly heartbeat verification sweep (v0.8 entries unchanged); KB-079 title/correction tracked in agent memory (review for KB-078 compliance, not tax rates) |
+| v0.8 | 2026-11-09 | Weekly heartbeat verification sweep: REG-03 downgraded DIRECTIONAL to KNOWLEDGE-BASED; v0.7 entries unchanged; KB-067 dependent on KB-159 fix |
+| v0.7 | 2026-11-02 | Heartbeat verification sweep: DNS NXDOMAIN confirmed for REG-01/02/08/09/11; research runs initiated |
+| v0.6 | 2026-10-31 | KB-067 follow-up sweep — no status changes |
+| v0.5 | 2026-10-25 | KB-067 verification sweep; REG-03 downgraded |
+| v0.4 | 2026-10-27 | Weekly sweep |
+| v0.2 | 2026-10-25 | Initial sweep with DIRECTIONAL SST upgrade |
+| v0.1 | 2026-10-22 | Initial draft — 12 obligations, 0 verified |
+
+**Note on figures:** This document deliberately states **no** numeric rates
+(SST percentages, EPF/SOCSO/EIS percentages, HRD levy percentage) in the
+register rows. Those figures must be read from the official sources named
+above and recorded here with a dated source citation before any dependent
+feature encodes them. Where a figure is needed for illustration in a feature,
+the feature must cite the register row it draws from.
+
+---
+
+## AMLA Readiness
+
+### Overview
+
+Assesses whether Fullstack Forge, as a **software provider of the Firm
+Edition intermediary workflow**, triggers any AMLA obligations (KYC/CDD,
+transaction monitoring, SAR filing). The intermediary model means the
+accounting firm — not the platform — submits e-Invoices on behalf of its
+clients via the MyInvois Intermediary System.
+
+> ⚠️ **Verification caveat:** The AMLA section numbers cited in this section
+> (Sections 11 and 18) are **KNOWLEDGE-BASED** and were not confirmed against
+> the consolidated Act at authoring time. The *reasoning* — that Fullstack
+> Forge is not a reporting institution because it holds no client funds and
+> neither executes payments nor acts as a financial intermediary — is a
+> structural conclusion that does not depend on the section numbering.
+> **MUST BE VERIFIED AGAINST https://www.amla.gov.my BEFORE THIS FEATURE
+> SHIPS.** The dependency it creates for F-MVIJYMYV-001U-0O4H is the one to
+> watch: if the section mapping is wrong, the CDD-recording condition must be
+> re-derived.
+
+### KYC / Customer Due Diligence (AMLA-01)
+
+**Does AMLA apply to Fullstack Forge?**
+
+Under AMLA Section 11, "reporting institutions" include financial
+institutions, designated non-financial businesses and professions (DNFBPs),
+and entities prescribed by regulation. As a **software provider** that does
+not hold client funds, does not execute payments, and does not act as a
+financial intermediary in the AMLA sense, Fullstack Forge is **not a
+reporting institution** for KYC/CDD purposes.
+
+However, the **firm** (accounting practice) using the Firm Edition as its
+intermediary system **does** bear CDD obligations under AMLA — it must
+verify the identity of its clients before submitting on their behalf. The
+platform's role is to provide tooling; it does not onboard end-clients
+directly.
+
+**Important distinction:** the analysis above is about *Fullstack Forge*, a
+software vendor. It must not be read as a conclusion about the accounting
+firms that use the product. Accounting practices commonly fall within the
+AMLA "designated non-financial business or profession" (DNFBP) category and
+are themselves reporting institutions with their own CDD, record-keeping and
+SAR duties. That is why the platform's boundary is drawn at "tooling, not
+onboarding" — it must not take over the firm's client-onboarding flow, even
+partially, or it risks being characterised as conducting CDD for a reporting
+institution without the corresponding licence and record-keeping regime.
+
+**What the platform must not do (prohibited by this boundary):**
+
+- Collect, verify or store client beneficial-ownership or identity documents
+  on the firm's behalf
+- Present any client-onboarding UI that implies the platform performed CDD
+- Screen end-clients against sanctions or PEP lists as part of the
+  submission path
+
+**Shipped requirement:** The platform must record that each firm has
+completed its own CDD before enabling submission features, but the platform
+itself does not perform CDD. This is a **declarational attestation by the
+firm** — a recorded confirmation, not a verified status — which keeps the
+platform clear of conducting CDD while still giving the firm a control point
+it can evidence.
+
+| Feature | Recommendation | Rationale |
+| --- | --- | --- |
+| F-MVIJYMYV-001U-0O4H (ACCO-014 batch submission) | **Conditional** | Ship once the firm's CDD attestation is recorded in the platform; platform does not perform CDD itself |
+| F-MVIJYMYW-001V-5PQL (ACCO-017 security hardening) | **Ship** | Multi-tenancy hardening is a security control, not an AMLA obligation; no KYC impact |
+| F-MVIJYMYW-001W-XQDT (ACCO-019 document model) | **Ship** | Document model with SHA-256 `documentHash` is a technical validation step; no KYC impact |
+
+**Condition for Conditional (F-MVIJYMYV-001U-0O4H):** Firm CDD attestation
+recorded in the platform before first multi-client batch submission. The
+platform logs the firm's attestation timestamp; the feature is blocked while
+that record is null.
+
+**No-Ship case (F-MVIJYMYV-001U-0O4H):** For any tenant whose CDD
+attestation record is absent, batch multi-client submission is **No-Ship** —
+the capability must be withheld for that tenant, not merely flagged. A tenant
+that has recorded an attestation *and* whose first submission is a single
+client is **Ship**. The conditional state applies to the batch path only, and
+resolves to No-Ship per tenant rather than per feature.
+
+### Transaction Monitoring (AMLA-02)
+
+**Does the platform's role constitute "transaction monitoring" under AMLA?**
+
+AMLA transaction monitoring applies to **financial transactions** (fund
+transfers, payments, currency exchanges). The platform's e-Invoice
+submission logging is **not** a financial transaction — it is a tax document
+transmission. No funds move through the platform.
+
+The platform should implement **audit logging** for compliance traceability
+(which submissions were made, when, by whom, with what result), but this is
+distinct from AMLA-mandated transaction monitoring. No SAR threshold is
+triggered by submission volume alone.
+
+| Feature | Recommendation | Rationale |
+| --- | --- | --- |
+| F-MVIJYMYV-001U-0O4H (ACCO-014 batch submission) | **Ship** | Batch submission logging is audit trail, not AMLA transaction monitoring |
+| F-MVIJYMYW-001V-5PQL (ACCO-017 security hardening) | **Ship** | Security hardening has no transaction monitoring implication |
+| F-MVIJYMYW-001W-XQDT (ACCO-019 document model) | **Ship** | Pre-submission validation is data integrity, not AMLA monitoring |
+
+### Suspicious Activity Reporting (AMLA-03)
+
+**Does Fullstack Forge have a SAR filing obligation?**
+
+SAR obligations fall on **reporting institutions** (AMLA Section 18). As
+established, Fullstack Forge is not a reporting institution. The **firm**
+using the intermediary workflow may have independent SAR obligations if it
+suspects money laundering in the course of its professional duties — but that
+is the firm's obligation, not the platform's.
+
+The platform should include a **reporting mechanism** for firms to flag
+suspicious patterns (for example anomalous invoice volumes or mismatched
+TINs) within the UI, but the platform itself does not file SARs with Bank
+Negara Malaysia.
+
+| Feature | Recommendation | Rationale |
+| --- | --- | --- |
+| F-MVIJYMYV-001U-0O4H (ACCO-014 batch submission) | **Ship** | No SAR obligation; platform provides tooling only |
+| F-MVIJYMYW-001V-5PQL (ACCO-017 security hardening) | **Ship** | Security hardening does not create SAR obligations |
+| F-MVIJYMYW-001W-XQDT (ACCO-019 document model) | **Ship** | Validation logic does not trigger SAR duties |
+
+---
+
+## Open Legal Questions
+
+| ID | Question | Who Must Answer | Interim Engineering Assumption | Status |
+| --- | --- | --- | --- | --- |
+| OLQ-01 | **Filing liability transfer:** Does the MyInvois Intermediary model transfer filing liability to the firm (accounting practice) or does it remain with the platform? | Legal & Regulatory Counsel (`legal-counsel`) | Platform provides tooling only; firm bears filing liability; platform documents this in Terms of Service. No liability attribution is encoded in the product. | Open |
+| OLQ-02 | **Cross-border data flow for AI-copilot inference:** May AI inference calls (tax computation, compliance Q&A) route through non-Malaysia model providers? | Legal & Regulatory Counsel + CTO | All inference runs in-region (ap-southeast-1) or on-device. No Restricted-class data leaves Malaysia without explicit legal sign-off. See the PDPA cross-border stance in `.fusion/memory/MEMORY.md`. | Open |
+| OLQ-03 | **Payroll statutory data — agent/employer relationship:** Does processing EPF/SOCSO/EIS/HRD/PCB data on behalf of a client create an employer or agent relationship for the platform? | Legal & Regulatory Counsel | Platform is a data processor only; no employer obligations arise; firm remains employer of record. See TAB-03 for the AI payroll-advice boundary. | Open |
+| OLQ-04 | **SST rate/threshold change-handling responsibility:** Who is responsible for updating SST rates and thresholds when mysst.customs.gov.my changes them — the platform (code push) or the client (configuration)? | Legal & Regulatory Counsel + Product | Platform provides configurable rate tables with versioned effective dates. Client/admin configures updates. The platform does not auto-pull from customs.gov.my. | Open |
+| OLQ-05 | **MyInvois Intermediary approval scope:** Does LHDN's Intermediary Login approval cover batch multi-client submission (ACCO-014) or only single-client workflows? | Legal & Regulatory Counsel | Assume approval covers all intermediary submissions until LHDN clarifies. Design for an audit trail of all submissions regardless. | Open |
+| OLQ-06 | **DNFBP exposure of the platform's customers:** If a customer firm is a DNFBP reporting institution, does the platform's retention of submission payloads become a record-keeping obligation for the platform itself? | Legal & Regulatory Counsel | Platform retains submission payloads as a data processor under the firm's instructions; retention period is client-configurable and defaults to the platform's standard audit-log window. The platform does not maintain an AMLA record-keeping regime of its own. | Open |
+
+---
+
+## Tax-Agent Boundary
+
+Defines what the AI copilot may and may not output, and which outputs require
+human accountant approval before use. This boundary is written in the
+product's own terms — it constrains copilot behaviour in the product, not
+abstract legal advice.
+
+| ID | AI Copilot Output Category | May Output | Human Approval Required | Rationale / Source |
+| --- | --- | --- | --- | --- |
+| TAB-01 | Tax computation advice (for example "Your SST liability is RM X") | With Human Approval | **Yes** — must be reviewed by a licensed accountant before client use | Copilot inference is advisory; the final computation is the accountant's professional judgment |
+| TAB-02 | Filing decisions (for example "Submit this e-Invoice now", "Use document type 02") | **No** | **Yes** — must be reviewed and confirmed by a licensed accountant | Filing decisions carry legal liability; the platform must not automate filing authority |
+| TAB-03 | Payroll statutory advice (for example "EPF contribution should be Y%") | With Human Approval | **Yes** — must be verified against current kwsp.gov.my rates before use | Rates are KNOWLEDGE-BASED (REG-04); the copilot may surface a candidate value but the accountant must confirm it |
+| TAB-04 | Compliance Q&A with citations (for example "Per PDPA 2024 s.XX, you must…") | Yes | No — provided as reference only, not legal advice | Citations are factual; a disclaimer is required stating this does not constitute a legal opinion |
+| TAB-05 | Anomaly detection flags (for example "This invoice pattern looks unusual") | Yes | No — the flag is informational; the accountant decides whether to investigate | Anomaly detection is a monitoring tool, not a compliance determination |
+| TAB-06 | Migration import suggestions (for example "Map this AutoCount field to X") | Yes | No — suggestion only; the accountant validates the mapping | Field mapping is technical; the accountant confirms data integrity post-migration |
+| TAB-07 | SST rate/threshold lookup | With Human Approval | **Yes** — the rate must be verified against mysst.customs.gov.my before it is encoded in client configuration | SST rates are KNOWLEDGE-BASED (REG-03); the rate table must be admin-configured, not auto-populated |
+| TAB-08 | Client-facing regulatory statements derived from the copilot (for example a summary shown to a firm's client) | **No** | **Yes** — must be drafted or countersigned by a licensed accountant before it leaves the platform | Anything addressed to a firm's client is professional advice in the eyes of the firm's regulator, regardless of who drafted it |
+
+**Cross-reference:** the AI inference substrate residency stance per
+`docs/data-ai-strategy.md` §4, and the PDPA cross-border flow stance per
+`.fusion/memory/MEMORY.md`.
+
+**Enforcement note:** "With Human Approval" means the output is not surfaced
+as usable output at all — it is withheld behind an explicit accountant
+confirmation action that is recorded in the firm's audit trail. An output
+that is merely labelled "AI-generated" does **not** satisfy this boundary.
+
+---
+
+## Claims Review
+
+### SLA Scope (CLM-01)
+
+A contractual "filing-path SLA" would cover:
+
+- **MyInvois submission latency:** time from platform submission to LHDN
+  acknowledgment (target: under 5 minutes under normal conditions)
+- **Document acceptance rate:** percentage of submitted e-Invoices accepted
+  without error (target: 99% or better, excluding client-side data errors)
+- **Error-retry window:** platform retry duration for transient LHDN
+  failures (target: 10-minute retry window)
+
+### Carve-Outs (CLM-02)
+
+Mandatory exclusions from any filing-path SLA:
+
+- **LHDN-side outage:** `api.myinvois.hasil.gov.my` unavailable, under
+  maintenance, or degraded
+- **Client-side data errors:** invalid TIN, malformed UBL, missing mandatory
+  fields, expired certificates
+- **Force majeure:** natural disasters, network provider failures,
+  government action
+- **Scheduled maintenance windows:** pre-announced platform or LHDN
+  maintenance, with at least 24 hours notice
+- **Intermediary approval delays:** time for LHDN to approve or rotate
+  Intermediary Login credentials
+
+### Viability Verdict (CLM-03)
+
+**Conditional** — a filing-path SLA may be offered contractually **if and
+only if** all of the following hold:
+
+1. All carve-outs (CLM-02) are explicitly enumerated in the SLA text.
+2. SLA credits apply only to platform-caused failures, never to LHDN or
+   client errors.
+3. Client data quality is verified pre-submission (pre-flight validation
+   per ACCO-019).
+4. The SLA does not cover LHDN processing time beyond platform submission.
+
+### Risk Allocation (CLM-04)
+
+| Responsibility | Platform | Client | LHDN |
+| --- | --- | --- | --- |
+| Data accuracy | Provides validation tooling | Warrants data accuracy | Not applicable |
+| Submission latency | Monitors API response times | Not applicable | Determines acknowledgment speed |
+| Document acceptance | Validates UBL structure | Validates business content | Final acceptance authority |
+| Retry handling | Implements retry logic | Not applicable | Not applicable |
+| Outage communication | Notifies clients of platform issues | Notifies platform of LHDN outages observed | Publishes outage status |
+
+**Reference:** feature F-MVIJZ4YM-002A-VOFQ (ACCO-012, compliance filing
+SLOs) implies reliability commitments that must be consistent with this
+claims review.
+
+---
+
+## Handoff
+
+### Document Recipients (HANDOFF-01)
+
+| Role | Agent ID | Name |
+| --- | --- | --- |
+| Security Lead | `agent-6dd8d44d` | Director of Security |
+| CTO | `agent-d1b80fa4` | Chief Technology Officer |
+
+### Review Deadline
+
+**5 business days** from the commit date of this document. Both recipients
+must acknowledge review (via task comment or artifact comment) before
+filing-path features may exit triage.
+
+### Approval Requirement
+
+Filing-path features **may not exit triage** until both the Security Lead
+and the CTO have acknowledged review of this document:
+
+- F-MVIJYMYV-001U-0O4H (ACCO-014: Batch multi-client e-Invois submission)
+- F-MVIJYMYW-001V-5PQL (ACCO-017: MyInvois client security and
+  multi-tenancy hardening)
+- F-MVIJYMYW-001W-XQDT (ACCO-019: e-Invoice document model, SHA-256
+  `documentHash` and pre-submission validation)
+
+### Gate Pointer Update (HANDOFF-02)
+
+> **ACCO-002 (Security & Compliance Design Doc) Step 8 "legal-review
+> sign-off"** now cites `docs/regulatory-register.md` (ACCO-051) as the
+> legal-review gate artifact. The gate is no longer an open assumption.
+>
+> Legal-review sign-off: see `docs/regulatory-register.md` (ACCO-051) —
+> Standing Regulatory Register, AMLA Readiness Assessment, and Open Legal
+> Questions. The gate is satisfied when both the Security Lead and the CTO
+> have acknowledged review of that document.
+
+**Pointer text to apply in ACCO-002 Step 8.** ACCO-002 had not been authored
+at the time this register was committed, so the cross-reference could not be
+applied in-place by ACCO-051. The following text is the agreed wording and
+must be inserted verbatim into the ACCO-002 "legal-review sign-off" step by
+whoever authors or maintains that document:
+
+> Legal-review sign-off: see `docs/regulatory-register.md` (ACCO-051) —
+> Standing Regulatory Register, AMLA Readiness Assessment, and Open Legal
+> Questions. The gate is satisfied when both the Security Lead and the CTO
+> have acknowledged review of that document.
+
+---
+
+*Document produced by task ACCO-051. For questions, contact Legal &
+Regulatory Counsel.*

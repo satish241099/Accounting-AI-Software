@@ -1,0 +1,374 @@
+openapi: 3.0.3
+info:
+  title: Multi-Tenant Kernel API
+  version: 1.0.0
+  description: |
+    Multi-tenant kernel API surface with tenant-scoped route classification.
+    
+    Route classification taxonomy (single source of truth):
+    - public: No authentication required
+    - authenticated-no-tenant: Authenticated user, no tenant context
+    - tenant-scoped: Requires X-Business-Id header, validated against business_membership, tenant_id propagated via SET LOCAL
+    
+    Tenant context propagation:
+    - Header: X-Business-Id (UUID)
+    - Database: app.tenant_id uuid with SET LOCAL (first statement of every transaction)
+    - Fail-closed: No tenant context = no rows returned
+  contact:
+    name: API Engineering
+    email: api@fullstackforge.example
+  license:
+    name: Internal
+    url: https://fullstackforge.example/license
+
+servers:
+  - url: http://localhost:3000/v1
+    description: Development server
+  - url: https://api.accounting.my/v1
+    description: Production server
+  - url: https://staging-api.accounting.my/v1
+    description: Staging server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearerauth
+      bearerFormat: JWT
+      description: Bearer token for authenticated users
+
+
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        refusal_reason:
+          $ref: '#/components/schemas/RefusalReason'
+        details:
+          type: object
+          additionalProperties: true
+        trace_id:
+          type: string
+          format: uuid
+          description: Request trace identifier for support
+
+    RefusalReason:
+      type: string
+      enum:
+        - no_evidence
+        - blocked_source
+        - restricted_content
+        - schema_violation
+        - citation_missing
+      description: |
+        ACXO-058-style refusal reason enum for shared error schema.
+        Used to classify why a request was refused.
+        
+        - no_evidence: Insufficient evidence to fulfill request
+        - blocked_source: Requested source is blocked
+        - restricted_content: Requested content is restricted
+        - schema_violation: Request violates schema constraints
+        - citation_missing: Required citation is missing
+
+    BusinessSummary:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+
+    UserSummary:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+
+tags:
+  - name: Health
+    description: Public health check endpoints
+  - name: Auth
+    description: Authentication and user management
+  - name: Tenant
+    description: Tenant-scoped operations requiring X-Business-Id
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Public health check, no authentication required
+      security: []
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/callback:
+    get:
+      tags:
+        - Health
+      summary: OIDC callback
+      description: Public OIDC callback endpoint
+      security: []
+      operationId: oidcCallback
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: state
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Callback processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '302':
+          description: Redirect to application
+        '400':
+          description: Invalid callback parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /me:
+    get:
+      tags:
+        - Auth
+      summary: Get current user
+      description: |
+        Authenticated-no-tenant route.
+        Returns current authenticated user without requiring tenant context.
+        No X-Business-Id header required.
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /me/businesses:
+    get:
+      tags:
+        - Auth
+      summary: List user's businesses
+      description: |
+        Authenticated-no-tenant route.
+        Returns all businesses the authenticated user has membership in.
+        No tenant context required.
+      operationId: listUserBusinesses
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Business list retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BusinessSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /invites/accept:
+    post:
+      tags:
+        - Auth
+      summary: Accept invitation
+      description: |
+        Authenticated-no-tenant route.
+        Accept a business invitation without requiring tenant context.
+        Tenant context is established after acceptance.
+      operationId: acceptInvite
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Invitation accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  business_id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /businesses:
+    post:
+      tags:
+        - Auth
+      summary: Create new business
+      description: |
+        Authenticated-no-tenant route.
+        Create a new business. The creator becomes the owner.
+        No tenant context required for creation.
+      operationId: createBusiness
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+      responses:
+        '201':
+          description: Business created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessSummary'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /businesses/{id}:
+    get:
+      tags:
+        - Tenant
+      summary: Get business details
+      description: |
+        Tenant-scoped route.
+        Requires X-Business-Id header.
+        Tenant context validated against business_membership.
+      operationId: getBusiness
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: header
+          name: X-Business-Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Business UUID for tenant context
+      responses:
+        '200':
+          description: Business details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessSummary'
+        '403':
+          description: Forbidden - not a member of business
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+

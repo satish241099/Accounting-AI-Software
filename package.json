@@ -4,12 +4,32 @@
   "description": "API design artifacts for the Malaysia Accounting SaaS — Firm Edition workspace & client entity onboarding",
   "private": true,
   "scripts": {
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint --ext .ts src/",
+    "start": "node -r ts-node/register/transpile-only src/index.ts",
     "openapi:validate": "npx @redocly/cli lint docs/api/openapi.yaml",
     "graphql:validate": "npx graphql-schema-linter docs/api/graphql/schema.graphql",
-    "validate:all": "npm run openapi:validate && npm run graphql:validate"
+    "validate:all": "npm run openapi:validate && npm run graphql:validate",
+    "test:provider": "vitest run tests/provider-catalog.test.js",
+    "test:routing": "vitest run tests/routing-rules.test.js"
+  },
+  "dependencies": {
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/jwt": "^10.0.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0"
   },
   "devDependencies": {
     "@redocly/cli": "^1.0.0",
-    "graphql-schema-linter": "^0.0.12"
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "vitest": "^1.0.0",
+    "ts-node": "^10.9.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
   }
 }
